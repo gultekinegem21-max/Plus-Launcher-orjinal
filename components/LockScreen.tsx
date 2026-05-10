@@ -246,16 +246,16 @@ const LockScreen: React.FC<LockScreenProps> = ({
         <Clock />
       </div>
 
-      <div className={`w-full max-w-[240px] flex flex-col items-center space-y-2 transition-all duration-500 ${error ? 'animate-wiggle' : ''} ${success ? 'scale-125 opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`w-full max-w-[320px] flex flex-col items-center space-y-4 transition-all duration-500 ${error ? 'animate-wiggle' : ''} ${success ? 'scale-125 opacity-0 pointer-events-none' : 'opacity-100'}`}>
         
         {/* Guard Header */}
-        <div className="flex flex-col items-center gap-0.5">
-          <div className={`p-1.5 rounded-lg transition-all duration-300 ${success ? 'bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.5)]' : error ? 'bg-red-600' : isVerifying ? 'bg-amber-600 animate-pulse' : isScanning ? 'bg-blue-600' : 'bg-white/5'} text-white`}>
-            {view === 'recovery' ? <MailIcon className="w-4 h-4" /> : isSetup || isRecoveryUpdate ? <ShieldCheckIcon className="w-4 h-4" /> : (isFaceIdSetup || faceIdEnabled) ? <FaceIdIcon className="w-4 h-4" /> : <FingerprintIcon className="w-4 h-4" />}
+        <div className="flex flex-col items-center gap-2">
+          <div className={`p-3 rounded-2xl transition-all duration-300 ${success ? 'bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.5)]' : error ? 'bg-red-600' : isVerifying ? 'bg-amber-600 animate-pulse' : isScanning ? 'bg-blue-600' : 'bg-white/5'} text-white`}>
+            {view === 'recovery' ? <MailIcon className="w-8 h-8" /> : isSetup || isRecoveryUpdate ? <ShieldCheckIcon className="w-8 h-8" /> : (isFaceIdSetup || faceIdEnabled) ? <FaceIdIcon className="w-8 h-8" /> : <FingerprintIcon className="w-8 h-8" />}
           </div>
           <div className="text-center">
-            <h2 className="text-[10px] font-black text-white tracking-[0.1em] uppercase">Plus Guard</h2>
-            <p className={`h-3 text-[8px] font-bold tracking-widest uppercase transition-colors ${success ? 'text-green-400' : error ? 'text-red-400' : isVerifying ? 'text-amber-400' : isScanning ? 'text-blue-400' : 'text-gray-500'}`}>
+            <h2 className="text-sm font-black text-white tracking-[0.1em] uppercase">Plus Guard</h2>
+            <p className={`h-4 text-xs font-bold tracking-widest uppercase transition-colors ${success ? 'text-green-400' : error ? 'text-red-400' : isVerifying ? 'text-amber-400' : isScanning ? 'text-blue-400' : 'text-gray-500'}`}>
                {view === 'recovery' ? 'Recovery' : view === 'setup-recovery' ? (isRecoveryUpdate ? 'Update Recovery' : 'Recovery Setup') : success ? 'Authorized' : analysisText}
             </p>
           </div>
@@ -301,38 +301,28 @@ const LockScreen: React.FC<LockScreenProps> = ({
 
             {/* PIN Pad */}
             {!isFingerprintSetup && !isFaceIdSetup && !isScanning && !isVerifying && (
-                <div className="flex flex-col items-center gap-2 w-full">
-                    <div className="flex justify-center gap-1.5 h-3">
+                <div className="flex flex-col items-center gap-4 w-full mt-4">
+                    <div className="flex justify-center gap-3 h-4">
                         {Array.from({ length: Math.max(input.length, 4) }).map((_, i) => (
-                            <div key={i} className={`w-1.5 h-1.5 rounded-full border transition-all ${i < input.length ? 'bg-blue-500 border-blue-500 scale-110 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'border-white/10 bg-transparent'}`} />
+                            <div key={i} className={`w-3 h-3 rounded-full border transition-all ${i < input.length ? 'bg-blue-500 border-blue-500 scale-110 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'border-white/10 bg-transparent'}`} />
                         ))}
                     </div>
-                    <div className="grid grid-cols-3 gap-1.5 w-full max-w-[150px]">
+                    <div className="grid grid-cols-3 gap-3 w-full max-w-[240px]">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                            <button key={num} onClick={() => handleKeypad(num.toString())} className="aspect-square rounded-lg bg-white/5 text-white text-sm font-bold border border-white/5 active:bg-blue-600/30 transition-colors">{num}</button>
+                            <button key={num} onClick={() => handleKeypad(num.toString())} className="aspect-square rounded-2xl bg-white/5 text-white text-2xl font-bold border border-white/5 active:bg-blue-600/30 transition-colors">{num}</button>
                         ))}
-                        <button onClick={handleBackspace} className="aspect-square flex items-center justify-center text-white/20 active:text-white"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth={2.5} d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.37-6.37a2.25 2.25 0 010-3.18l6.37-6.37A2.25 2.25 0 0110.47 2.25h10.28c1.242 0 2.25 1.008 2.25 2.25v15a2.25 2.25 0 01-2.25 2.25H10.47a2.25 2.25 0 01-1.47-.58z" /></svg></button>
-                        <button onClick={() => handleKeypad('0')} className="aspect-square rounded-lg bg-white/5 text-white text-sm font-bold border border-white/5 active:bg-blue-600/30">0</button>
-                        <button onClick={handleUnlock} disabled={input.length < 4} className="aspect-square flex items-center justify-center rounded-lg bg-blue-600 text-white active:scale-95 disabled:opacity-5 shadow-lg"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></button>
+                        <button onClick={handleBackspace} className="aspect-square flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-white/40 active:text-white transition-colors"><svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth={2.5} d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.37-6.37a2.25 2.25 0 010-3.18l6.37-6.37A2.25 2.25 0 0110.47 2.25h10.28c1.242 0 2.25 1.008 2.25 2.25v15a2.25 2.25 0 01-2.25 2.25H10.47a2.25 2.25 0 01-1.47-.58z" /></svg></button>
+                        <button onClick={() => handleKeypad('0')} className="aspect-square rounded-2xl bg-white/5 text-white text-2xl font-bold border border-white/5 active:bg-blue-600/30 transition-colors">0</button>
+                        <button onClick={handleUnlock} disabled={input.length < 4} className="aspect-square flex items-center justify-center rounded-2xl bg-blue-600 text-white active:scale-95 disabled:opacity-5 transition-all shadow-lg shadow-blue-500/20"><svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></button>
                     </div>
                     
                     {!isSetup && (
-                      <div className="flex w-full justify-between items-center px-1 mt-2">
+                      <div className="flex w-full justify-center items-center px-1 mt-6">
                         <button 
                           onClick={() => setView(recoveryQuestion ? 'recovery' : 'reset')}
-                          className="text-[9px] text-blue-500 hover:text-blue-400 font-bold uppercase tracking-widest"
+                          className="text-xs text-blue-500 hover:text-blue-400 font-bold uppercase tracking-widest px-4 py-2"
                         >
                           Forgot Password?
-                        </button>
-                        <button 
-                          onClick={() => {
-                              if (onUnlock('3443')) {
-                                  setSuccess(true);
-                              }
-                          }}
-                          className="text-[9px] text-amber-500 hover:text-amber-400 font-bold uppercase tracking-widest"
-                        >
-                          Administrator
                         </button>
                       </div>
                     )}
