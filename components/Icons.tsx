@@ -116,6 +116,18 @@ export const ShieldCheckIcon = ({ className = 'h-6 w-6' }: IconProps) => (
   </svg>
 );
 
+export const FingerprintIcon = ({ className = 'h-6 w-6' }: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.263a2.25 2.25 0 01-2.097 1.423h-.34a2.25 2.25 0 01-2.097-1.423 42.711 42.711 0 00-1.559-3.51c-.812-1.615-1.157-3.386-1.157-5.253 0-1.307.33-2.537.914-3.607M14.25 10.5v1.5a3 3 0 11-6 0v-1.5a3 3 0 116 0zM6.75 15.75a6.75 6.75 0 01-6.75-6.75v-1.5a6.75 6.75 0 0113.5 0v1.5a6.75 6.75 0 01-6.75 6.75z" />
+  </svg>
+);
+
+export const FaceIdIcon = ({ className = 'h-6 w-6' }: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75s.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+  </svg>
+);
+
 export const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
   MailIcon,
   CalendarIcon,
@@ -135,4 +147,6 @@ export const iconMap: { [key: string]: React.ComponentType<{ className?: string 
   UserIcon,
   LockIcon,
   ShieldCheckIcon,
+  FingerprintIcon,
+  FaceIdIcon,
 };

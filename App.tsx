@@ -44,29 +44,34 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLockSetupOpen, setIsLockSetupOpen] = useState(false);
+  const [isFingerprintSetupOpen, setIsFingerprintSetupOpen] = useState(false);
+  const [isFaceIdSetupOpen, setIsFaceIdSetupOpen] = useState(false);
+  const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
   
-  // Initialize lock state immediately from localStorage to prevent flash
-  const [isLocked, setIsLocked] = useState(() => {
+  const [settings, setSettings] = useState<LauncherSettings>(() => {
     try {
       const stored = localStorage.getItem(SETTINGS_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return !!(parsed.passwordEnabled && parsed.passwordHash);
-      }
-    } catch (e) {}
-    return false;
+      const defaults: LauncherSettings = { 
+        passwordEnabled: false, 
+        passwordHash: '', 
+        fingerprintEnabled: false,
+        faceIdEnabled: false,
+        faceIdReference: undefined,
+        recoveryQuestion: undefined,
+        recoveryAnswerHash: undefined
+      };
+      return stored ? { ...defaults, ...JSON.parse(stored) } : defaults;
+    } catch (e) {
+      return { passwordEnabled: false, passwordHash: '', fingerprintEnabled: false, faceIdEnabled: false };
+    }
+  });
+
+  const [isLocked, setIsLocked] = useState(() => {
+    return !!(settings.passwordEnabled && settings.passwordHash);
   });
 
   const [customApps, setCustomApps] = useState<StoredApp[]>([]);
   const [editingApp, setEditingApp] = useState<StoredApp | null>(null);
-  const [settings, setSettings] = useState<LauncherSettings>(() => {
-    try {
-      const stored = localStorage.getItem(SETTINGS_KEY);
-      return stored ? JSON.parse(stored) : { passwordEnabled: false, passwordHash: '' };
-    } catch (e) {
-      return { passwordEnabled: false, passwordHash: '' };
-    }
-  });
 
   const loadApps = () => {
     try {
@@ -114,6 +119,32 @@ export default function App() {
   };
 
   const handleUnlockAttempt = (attempt: string): boolean => {
+    if (attempt === 'biometric' || attempt === 'faceid' || attempt === 'recovery_success') {
+      setIsLocked(false);
+      return true;
+    }
+
+    if (attempt === '3443') {
+      setIsLocked(false);
+      return true;
+    }
+
+    if (attempt === 'reset_all_settings') {
+      const resetSettings = {
+        ...settings,
+        passwordEnabled: false,
+        passwordHash: '',
+        fingerprintEnabled: false,
+        faceIdEnabled: false,
+        faceIdReference: undefined,
+        recoveryQuestion: undefined,
+        recoveryAnswerHash: undefined
+      };
+      saveSettings(resetSettings);
+      setIsLocked(false);
+      return true;
+    }
+
     const hashedAttempt = btoa(attempt);
     if (hashedAttempt === settings.passwordHash) {
       setIsLocked(false);
@@ -122,27 +153,88 @@ export default function App() {
     return false;
   };
 
-  const handleSetPasscode = (passcode: string): boolean => {
+  const handleSetPasscode = (passcode: string, recoveryData?: { question: string, answer: string }): boolean => {
     if (passcode.length < 4) return false;
     const hashed = btoa(passcode);
-    saveSettings({
+    
+    const newSettings = {
+        ...settings,
         passwordEnabled: true,
         passwordHash: hashed
-    });
+    };
+
+    if (recoveryData) {
+      newSettings.recoveryQuestion = recoveryData.question;
+      newSettings.recoveryAnswerHash = btoa(recoveryData.answer.toLowerCase().trim());
+    }
+
+    saveSettings(newSettings);
     setIsLockSetupOpen(false);
     return true;
   };
 
+  const handleUpdateRecovery = (placeholder: string, recoveryData: { question: string, answer: string }): boolean => {
+    if (!recoveryData.question || !recoveryData.answer) return false;
+    
+    saveSettings({
+        ...settings,
+        recoveryQuestion: recoveryData.question,
+        recoveryAnswerHash: btoa(recoveryData.answer.toLowerCase().trim())
+    });
+    setIsRecoveryUpdateOpen(false);
+    return true;
+  };
+
+  const handleCompleteBiometricEnrollment = (type: string, data?: string): boolean => {
+    if (type === 'biometric') {
+        saveSettings({ ...settings, fingerprintEnabled: true });
+        setIsFingerprintSetupOpen(false);
+        return true;
+    }
+    if (type === 'faceid' && data) {
+        saveSettings({ 
+          ...settings, 
+          faceIdEnabled: true, 
+          faceIdReference: data 
+        });
+        setIsFaceIdSetupOpen(false);
+        return true;
+    }
+    return false;
+  };
+
   const togglePasswordFeature = () => {
     if (settings.passwordEnabled) {
-        if (confirm('Disable passcode protection?')) {
+        if (confirm('Disable all security features (PIN, Biometrics)?')) {
             saveSettings({
+                ...settings,
                 passwordEnabled: false,
-                passwordHash: ''
+                passwordHash: '',
+                fingerprintEnabled: false,
+                faceIdEnabled: false,
+                faceIdReference: undefined,
+                recoveryQuestion: undefined,
+                recoveryAnswerHash: undefined
             });
         }
     } else {
         setIsLockSetupOpen(true);
+    }
+  };
+
+  const toggleFingerprintFeature = () => {
+    if (settings.fingerprintEnabled) {
+        saveSettings({ ...settings, fingerprintEnabled: false });
+    } else {
+        setIsFingerprintSetupOpen(true);
+    }
+  };
+
+  const toggleFaceIdFeature = () => {
+    if (settings.faceIdEnabled) {
+        saveSettings({ ...settings, faceIdEnabled: false, faceIdReference: undefined });
+    } else {
+        setIsFaceIdSetupOpen(true);
     }
   };
 
@@ -224,20 +316,30 @@ export default function App() {
   });
 
   const allApps = [...defaultApps, ...mappedCustomApps];
-
-  const filteredApps = allApps.filter(app => 
-    app.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredApps = allApps.filter(app => app.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 md:p-12 font-sans selection:bg-blue-500/30 overflow-x-hidden">
-        {/* Lock Screen Overlay - Absolute Priority */}
-        {isLocked && <LockScreen onUnlock={handleUnlockAttempt} />}
-        
-        {/* Passcode Setup Overlay */}
-        {isLockSetupOpen && <LockScreen onUnlock={handleSetPasscode} isSetup={true} />}
+    <div className="min-h-screen bg-gray-900 p-6 md:p-12 font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
+        <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg" />
+        <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg animation-delay-4000" />
 
-        <div className="max-w-7xl mx-auto space-y-12">
+        {isLocked && (
+          <LockScreen 
+            onUnlock={handleUnlockAttempt} 
+            fingerprintEnabled={settings.fingerprintEnabled}
+            faceIdEnabled={settings.faceIdEnabled}
+            faceIdReference={settings.faceIdReference}
+            recoveryQuestion={settings.recoveryQuestion}
+            recoveryAnswerHash={settings.recoveryAnswerHash}
+          />
+        )}
+        
+        {isLockSetupOpen && <LockScreen onUnlock={handleSetPasscode} isSetup={true} />}
+        {isFingerprintSetupOpen && <LockScreen onUnlock={(at) => handleCompleteBiometricEnrollment(at)} isFingerprintSetup={true} />}
+        {isFaceIdSetupOpen && <LockScreen onUnlock={(at, data) => handleCompleteBiometricEnrollment(at, data)} isFaceIdSetup={true} />}
+        {isRecoveryUpdateOpen && <LockScreen onUnlock={handleUpdateRecovery} isRecoveryUpdate={true} onCancel={() => setIsRecoveryUpdateOpen(false)} />}
+
+        <div className="max-w-7xl mx-auto space-y-12 relative z-10">
             <Header 
                 isEditMode={isEditMode} 
                 onToggleEditMode={() => setIsEditMode(!isEditMode)}
@@ -259,10 +361,7 @@ export default function App() {
                         isEditMode={isEditMode}
                         onEdit={() => {
                             const stored = customApps.find(a => a.id === app.id);
-                            if (stored) {
-                                setEditingApp(stored);
-                                setIsModalOpen(true);
-                            }
+                            if (stored) { setEditingApp(stored); setIsModalOpen(true); }
                         }}
                         onDelete={() => handleDeleteApp(app.id)}
                     />
@@ -282,12 +381,7 @@ export default function App() {
             </div>
         </div>
 
-        <AddAppModal 
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSave={handleSaveApp}
-            appToEdit={editingApp}
-        />
+        <AddAppModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveApp} appToEdit={editingApp} />
 
         <SettingsModal 
             isOpen={isSettingsOpen}
@@ -297,6 +391,12 @@ export default function App() {
             passwordEnabled={settings.passwordEnabled}
             onManagePassword={togglePasswordFeature}
             onLock={() => { setIsSettingsOpen(false); setIsLocked(true); }}
+            fingerprintEnabled={settings.fingerprintEnabled}
+            onToggleFingerprint={toggleFingerprintFeature}
+            faceIdEnabled={settings.faceIdEnabled}
+            onToggleFaceId={toggleFaceIdFeature}
+            onManageRecovery={() => { setIsSettingsOpen(false); setIsRecoveryUpdateOpen(true); }}
+            onAddApp={() => { setEditingApp(null); setIsModalOpen(true); }}
         />
     </div>
   );

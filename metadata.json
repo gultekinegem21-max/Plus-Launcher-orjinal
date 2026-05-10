@@ -1,5 +1,7 @@
 {
   "name": "Plus+Launcher",
   "description": "A modern, sleek, and personal application launcher to organize and quickly access your favorite apps and links.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }
