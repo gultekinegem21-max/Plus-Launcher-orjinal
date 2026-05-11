@@ -354,7 +354,10 @@ export default function App() {
       name: "Global Chat",
       icon: ChatIcon,
       color: "#8b5cf6",
-      action: () => setIsChatOpen(true),
+      action: () => {
+        console.log("Global chat icon clicked. Setting isChatOpen to true");
+        setIsChatOpen(true);
+      },
       isCustom: false,
     },
     {

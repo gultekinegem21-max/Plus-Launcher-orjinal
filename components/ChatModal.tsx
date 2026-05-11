@@ -39,6 +39,8 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  console.log("ChatModal rendering, isOpen:", isOpen, "user:", user ? user.uid : 'null');
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => setUser(u));
     return unsub;
@@ -119,11 +121,23 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     }
   };
 
+  const formatTime = (timestamp: any) => {
+    if (!timestamp) return "";
+    try {
+      if (typeof timestamp.toDate === 'function') {
+        return format(timestamp.toDate(), "h:mm a");
+      }
+      return format(new Date(timestamp), "h:mm a");
+    } catch(e) {
+      return "";
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-300">
-      <div className="bg-gray-900/40 backdrop-blur-3xl border border-white/10 rounded-2xl w-full max-w-2xl h-[85vh] flex flex-col overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-300 pointer-events-auto">
+      <div className="bg-gray-900/80 backdrop-blur-3xl border border-white/10 rounded-2xl w-full max-w-2xl h-[85vh] flex flex-col overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
         <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 flex-shrink-0">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             Global Chat
@@ -215,9 +229,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                             {isMe ? "You" : msg.userName}
                           </span>
                           <span className="text-[9px] text-gray-500">
-                            {msg.createdAt
-                              ? format(msg.createdAt.toDate(), "h:mm a")
-                              : ""}
+                            {formatTime(msg.createdAt)}
                           </span>
                         </div>
                         <div
