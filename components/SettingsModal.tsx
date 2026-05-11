@@ -104,7 +104,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 max-h-[75vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
           <div className="space-y-3">
             <p className="text-white text-xs font-medium">Account Settings</p>
             {currentUser ? (
@@ -342,7 +342,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                   
                   {isViewingFeedback && (
-                    <div className="mt-4 p-3 bg-black/40 border border-gray-700 rounded-xl space-y-3 max-h-48 overflow-y-auto">
+                    <div className="mt-4 p-3 bg-black/40 border border-gray-700 rounded-xl space-y-3 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
                       <div className="flex items-center justify-between">
                         <p className="text-gray-300 text-[10px] font-bold uppercase tracking-widest">Inbox ({feedbacks.length})</p>
                         {feedbacks.length > 0 && (

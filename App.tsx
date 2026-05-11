@@ -387,8 +387,8 @@ export default function App() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6 selection:bg-blue-500/30">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-gray-900/0 to-gray-950/80 pointer-events-none" />
+      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-gray-950 to-purple-950 flex flex-col items-center justify-center p-6 selection:bg-blue-500/30">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/10 via-gray-900/0 to-purple-950/20 pointer-events-none" />
         <div className="bg-white/5 p-8 rounded-3xl border border-white/10 text-center space-y-8 max-w-sm w-full backdrop-blur-2xl shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto border border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.15)] relative">
             <div className="absolute inset-0 rounded-full border border-blue-500/30 animate-ping opacity-20" />
@@ -444,7 +444,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 md:p-12 font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-gradient-to-b from-blue-950 via-gray-900 to-purple-950 p-6 md:p-12 font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
       <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg animation-delay-4000" />
 
