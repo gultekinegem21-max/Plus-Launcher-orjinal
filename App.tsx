@@ -64,7 +64,7 @@ export default function App() {
   const [isFaceIdSetupOpen, setIsFaceIdSetupOpen] = useState(false);
   const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<string | null>(() =>
-    localStorage.getItem("plus-launcher-user"),
+    localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user"),
   );
 
   const [settings, setSettings] = useState<LauncherSettings>(() => {
@@ -408,8 +408,13 @@ export default function App() {
               e.preventDefault();
               const fd = new FormData(e.currentTarget);
               const user = fd.get("username") as string;
+              const rememberMe = fd.get("rememberMe") === "on";
               if (user.trim()) {
-                localStorage.setItem("plus-launcher-user", user.trim());
+                if (rememberMe) {
+                  localStorage.setItem("plus-launcher-user", user.trim());
+                } else {
+                  sessionStorage.setItem("plus-launcher-user", user.trim());
+                }
                 setCurrentUser(user.trim());
               }
             }}
@@ -421,6 +426,10 @@ export default function App() {
                 className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-5 text-white text-sm focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all font-medium group-hover:border-white/20"
                 autoFocus
               />
+            </div>
+            <div className="flex items-center gap-3 px-1">
+                <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4 rounded border-white/10 bg-black/50" defaultChecked />
+                <label htmlFor="rememberMe" className="text-gray-400 text-xs cursor-pointer select-none">Remember me</label>
             </div>
             <button
               type="submit"
@@ -570,11 +579,16 @@ export default function App() {
         currentUser={currentUser}
         onLogout={() => {
           localStorage.removeItem("plus-launcher-user");
+          sessionStorage.removeItem("plus-launcher-user");
           setCurrentUser(null);
           setIsSettingsOpen(false);
         }}
-        onLogin={(username) => {
-          localStorage.setItem("plus-launcher-user", username);
+        onLogin={(username, remember) => {
+          if (remember) {
+            localStorage.setItem("plus-launcher-user", username);
+          } else {
+            sessionStorage.setItem("plus-launcher-user", username);
+          }
           setCurrentUser(username);
         }}
       />

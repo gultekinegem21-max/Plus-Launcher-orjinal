@@ -23,7 +23,7 @@ interface SettingsModalProps {
   onAddApp?: () => void;
   currentUser?: string | null;
   onLogout?: () => void;
-  onLogin?: (username: string) => void;
+  onLogin?: (username: string, remember: boolean) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -108,27 +108,34 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           ) : (
             <>
               <form
-                className="flex items-center gap-2"
+                className="flex flex-col gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   const fd = new FormData(e.currentTarget);
                   const user = fd.get("username") as string;
+                  const remember = fd.get("rememberMe") === "on";
                   if (user.trim() && onLogin) {
-                    onLogin(user.trim());
+                    onLogin(user.trim(), remember);
                   }
                 }}
               >
-                <input
-                  name="username"
-                  placeholder="Account Name..."
-                  className="bg-black/50 text-white px-3 py-2 rounded-lg text-xs flex-1 border border-gray-700 focus:outline-none focus:border-blue-500"
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase"
-                >
-                  Sign In
-                </button>
+                <div className="flex items-center gap-2">
+                    <input
+                      name="username"
+                      placeholder="Account Name..."
+                      className="bg-black/50 text-white px-3 py-2 rounded-lg text-xs flex-1 border border-gray-700 focus:outline-none focus:border-blue-500"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase h-[34px]"
+                    >
+                      Sign In
+                    </button>
+                </div>
+                <div className="flex items-center gap-2 px-1">
+                    <input type="checkbox" id="settingsRememberMe" name="rememberMe" className="w-3.5 h-3.5 rounded border-white/10 bg-black/50" defaultChecked />
+                    <label htmlFor="settingsRememberMe" className="text-gray-400 text-[10px] cursor-pointer select-none">Remember account</label>
+                </div>
               </form>
               <div className="h-px bg-gray-700" />
             </>
