@@ -42,8 +42,13 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
 
   console.log("ChatModal rendering, isOpen:", isOpen, "user:", user ? user.uid : 'null');
 
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) setErrorMsg(null);
+    });
     return unsub;
   }, []);
 
@@ -85,19 +90,23 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   }, [messages]);
 
   const handleSignIn = async () => {
+    setErrorMsg(null);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign in failed", error);
+      setErrorMsg("Google Sign-In failed. " + (error.message || ""));
     }
   };
 
   const handleGuestSignIn = async () => {
+    setErrorMsg(null);
     try {
       await signInAnonymously(auth);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Guest sign in failed", error);
+      setErrorMsg("Guest Sign-In failed. Please ensure 'Anonymous' sign-in provider is enabled in your Firebase Console Authentication settings.");
     }
   };
 
@@ -179,6 +188,11 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             <p className="text-gray-400 mb-6 max-w-sm text-balance">
               Sign in with Google to start talking with people in the Global Chat.
             </p>
+            {errorMsg && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-lg w-full mb-4 text-left">
+                {errorMsg}
+              </div>
+            )}
             <button
               onClick={handleSignIn}
               className="bg-white text-gray-900 hover:bg-gray-200 font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-xl flex items-center gap-2 mb-4"
