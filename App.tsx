@@ -385,64 +385,6 @@ export default function App() {
     app.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6 selection:bg-blue-500/30">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-gray-900/0 to-gray-950/80 pointer-events-none" />
-        <div className="bg-white/5 p-8 rounded-3xl border border-white/10 text-center space-y-8 max-w-sm w-full backdrop-blur-2xl shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto border border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.15)] relative">
-            <div className="absolute inset-0 rounded-full border border-blue-500/30 animate-ping opacity-20" />
-            <UserIcon className="w-12 h-12 text-blue-500" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
-              Device Login
-            </h1>
-            <p className="text-gray-400 text-xs text-balance">
-              Enter your account name or ID to access this device.
-            </p>
-          </div>
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const fd = new FormData(e.currentTarget);
-              const user = fd.get("username") as string;
-              const rememberMe = fd.get("rememberMe") === "on";
-              if (user.trim()) {
-                if (rememberMe) {
-                  localStorage.setItem("plus-launcher-user", user.trim());
-                } else {
-                  sessionStorage.setItem("plus-launcher-user", user.trim());
-                }
-                setCurrentUser(user.trim());
-              }
-            }}
-          >
-            <div className="group relative">
-              <input
-                name="username"
-                placeholder="Account Name..."
-                className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-5 text-white text-sm focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all font-medium group-hover:border-white/20"
-                autoFocus
-              />
-            </div>
-            <div className="flex items-center gap-3 px-1">
-                <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4 rounded border-white/10 bg-black/50" defaultChecked />
-                <label htmlFor="rememberMe" className="text-gray-400 text-xs cursor-pointer select-none">Remember me</label>
-            </div>
-            <button
-              type="submit"
-              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-900 p-6 md:p-12 font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
       <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg" />

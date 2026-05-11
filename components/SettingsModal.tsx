@@ -83,8 +83,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         <div className="p-4 space-y-4">
-          {currentUser ? (
-            <>
+          <div className="space-y-3">
+            <p className="text-white text-xs font-medium">Account Settings</p>
+            {currentUser ? (
               <div className="flex items-center justify-between bg-black/20 p-3 rounded-xl border border-gray-700/50">
                 <div className="space-y-0.5">
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
@@ -103,10 +104,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   </button>
                 )}
               </div>
-              <div className="h-px bg-gray-700" />
-            </>
-          ) : (
-            <>
+            ) : (
               <form
                 className="flex flex-col gap-2"
                 onSubmit={(e) => {
@@ -133,13 +131,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     </button>
                 </div>
                 <div className="flex items-center gap-2 px-1">
-                    <input type="checkbox" id="settingsRememberMe" name="rememberMe" className="w-3.5 h-3.5 rounded border-white/10 bg-black/50" defaultChecked />
+                    <input type="checkbox" id="settingsRememberMe" name="rememberMe" className="w-3.5 h-3.5 rounded border-white/10 bg-black/50 accent-blue-500" defaultChecked />
                     <label htmlFor="settingsRememberMe" className="text-gray-400 text-[10px] cursor-pointer select-none">Remember account</label>
                 </div>
               </form>
-              <div className="h-px bg-gray-700" />
-            </>
-          )}
+            )}
+          </div>
+          <div className="h-px bg-gray-700" />
 
           <div className="flex items-center justify-between">
             <p className="text-white text-xs font-medium">Customization Mode</p>
