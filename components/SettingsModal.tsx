@@ -172,7 +172,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         </div>
                         
                         <div className="bg-black/20 rounded-lg p-2 border border-amber-500/20">
-                            <p className="text-[9px] text-amber-500/80 font-bold uppercase mb-2">Ban Manager</p>
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-[9px] text-amber-500/80 font-bold uppercase">Ban Manager</p>
+                                {bannedUsers.length > 0 && (
+                                    <button 
+                                        onClick={() => onUpdateBannedUsers && onUpdateBannedUsers([])}
+                                        className="text-[8px] text-red-500 hover:text-red-400 font-bold uppercase bg-red-500/10 px-1.5 py-0.5 rounded"
+                                    >
+                                        Unban All
+                                    </button>
+                                )}
+                            </div>
                             <div className="flex gap-2">
                                 <input 
                                     value={banInput}
@@ -183,14 +193,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 <button
                                     onClick={() => {
                                         if (banInput.trim() && onUpdateBannedUsers) {
-                                            onUpdateBannedUsers([...bannedUsers, banInput.trim()]);
+                                            const trimmed = banInput.trim();
+                                            if (bannedUsers.includes(trimmed)) {
+                                                onUpdateBannedUsers(bannedUsers.filter(u => u !== trimmed));
+                                            } else {
+                                                onUpdateBannedUsers([...bannedUsers, trimmed]);
+                                            }
                                             setBanInput('');
                                         }
                                     }}
                                     disabled={!banInput.trim()}
-                                    className="bg-amber-600 text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase disabled:opacity-50"
+                                    className={`${bannedUsers.includes(banInput.trim()) ? 'bg-red-600/80' : 'bg-amber-600'} text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase disabled:opacity-50 transition-colors`}
                                 >
-                                    Ban
+                                    {bannedUsers.includes(banInput.trim()) ? 'Unban' : 'Ban'}
                                 </button>
                             </div>
                             

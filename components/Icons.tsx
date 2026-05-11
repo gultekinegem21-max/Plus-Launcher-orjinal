@@ -128,6 +128,18 @@ export const FaceIdIcon = ({ className = 'h-6 w-6' }: IconProps) => (
   </svg>
 );
 
+export const AppleAppStoreIcon = ({ className = 'h-6 w-6' }: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 4.5A2.25 2.25 0 008.25 6.75V15a2.25 2.25 0 002.25 2.25h3.75A2.25 2.25 0 0016.5 15V6.75A2.25 2.25 0 0014.25 4.5h-3.75zM12 21a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" />
+  </svg>
+);
+
+export const MicrosoftStoreIcon = ({ className = 'h-6 w-6' }: IconProps) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v18h16.5V3H3.75zm3.75 12h9v-9h-9v9z" />
+  </svg>
+);
+
 export const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
   MailIcon,
   CalendarIcon,
@@ -149,4 +161,6 @@ export const iconMap: { [key: string]: React.ComponentType<{ className?: string 
   ShieldCheckIcon,
   FingerprintIcon,
   FaceIdIcon,
+  AppleAppStoreIcon,
+  MicrosoftStoreIcon,
 };

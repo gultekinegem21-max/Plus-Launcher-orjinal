@@ -11,7 +11,7 @@ import type { AppItem, StoredApp, LauncherSettings } from './types';
 import { 
   MailIcon, CalendarIcon, PhotosIcon, MusicIcon, SettingsIcon, 
   BrowserIcon, FilesIcon, MapsIcon, GameIcon, PlayStoreIcon, 
-  UserIcon, CodeIcon, LinkIcon, iconMap 
+  UserIcon, CodeIcon, LinkIcon, iconMap, AppleAppStoreIcon, MicrosoftStoreIcon
 } from './components/Icons';
 
 const LOCAL_STORAGE_KEY = 'plus-launcher-custom-apps';
@@ -269,6 +269,22 @@ export default function App() {
       icon: PlayStoreIcon,
       color: '#0ea5e9',
       action: () => window.open('https://play.google.com', '_blank'),
+      isCustom: false
+    },
+    {
+      id: 'applestore',
+      name: 'App Store',
+      icon: AppleAppStoreIcon,
+      color: '#3b82f6',
+      action: () => window.open('https://www.apple.com/app-store/', '_blank'),
+      isCustom: false
+    },
+    {
+      id: 'microsoftstore',
+      name: 'Microsoft Store',
+      icon: MicrosoftStoreIcon,
+      color: '#06b6d4',
+      action: () => window.open('https://apps.microsoft.com/', '_blank'),
       isCustom: false
     },
     {
