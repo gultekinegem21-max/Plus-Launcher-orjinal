@@ -195,7 +195,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             )}
             <button
               onClick={handleSignIn}
-              className="bg-white text-gray-900 hover:bg-gray-200 font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-xl flex items-center gap-2 mb-4"
+              className="bg-white text-gray-900 hover:bg-gray-200 font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-xl flex items-center justify-center gap-2 mb-4 w-full"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -219,7 +219,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             </button>
             <button
               onClick={handleGuestSignIn}
-              className="text-gray-400 hover:text-white text-sm transition-colors"
+              className="bg-gray-800 text-white hover:bg-gray-700 font-medium py-3 px-6 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-xl border border-white/10 w-full flex justify-center items-center"
             >
               Skip sign in and join as Guest
             </button>
