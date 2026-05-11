@@ -397,6 +397,8 @@ export default function App() {
             onToggleFaceId={toggleFaceIdFeature}
             onManageRecovery={() => { setIsSettingsOpen(false); setIsRecoveryUpdateOpen(true); }}
             onAddApp={() => { setEditingApp(null); setIsModalOpen(true); }}
+            bannedUsers={settings.bannedUsers || []}
+            onUpdateBannedUsers={(users) => saveSettings({ ...settings, bannedUsers: users })}
         />
     </div>
   );

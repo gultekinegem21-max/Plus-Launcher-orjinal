@@ -16,6 +16,8 @@ interface SettingsModalProps {
   onToggleFaceId?: () => void;
   onManageRecovery?: () => void;
   onAddApp?: () => void;
+  bannedUsers?: string[];
+  onUpdateBannedUsers?: (users: string[]) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ 
@@ -31,10 +33,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   faceIdEnabled,
   onToggleFaceId,
   onManageRecovery,
-  onAddApp
+  onAddApp,
+  bannedUsers = [],
+  onUpdateBannedUsers
 }) => {
   const [adminPin, setAdminPin] = React.useState('');
   const [isAdminUnlocked, setIsAdminUnlocked] = React.useState(false);
+  const [banInput, setBanInput] = React.useState('');
 
   // Reset admin state when modal closes
   React.useEffect(() => {
@@ -144,25 +149,71 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-2 animate-in fade-in zoom-in-95">
-                       <button 
-                          onClick={() => {
-                            onClose();
-                            if (onAddApp) onAddApp();
-                          }} 
-                          className="py-2 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 rounded-lg text-[10px] font-bold uppercase transition-colors"
-                       >
-                         Add App / Icon
-                       </button>
-                       <button 
-                          onClick={() => {
-                            onClose();
-                            onToggleEditMode();
-                          }} 
-                          className={`py-2 rounded-lg text-[10px] font-bold uppercase transition-colors ${isEditMode ? 'bg-red-600 text-white' : 'bg-red-600/20 hover:bg-red-600/40 text-red-500'}`}
-                       >
-                         {isEditMode ? 'Done Deleting' : 'Delete Apps'}
-                       </button>
+                    <div className="space-y-3 animate-in fade-in zoom-in-95">
+                        <div className="grid grid-cols-2 gap-2">
+                           <button 
+                              onClick={() => {
+                                onClose();
+                                if (onAddApp) onAddApp();
+                              }} 
+                              className="py-2 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 rounded-lg text-[10px] font-bold uppercase transition-colors"
+                           >
+                             Add App / Icon
+                           </button>
+                           <button 
+                              onClick={() => {
+                                onClose();
+                                onToggleEditMode();
+                              }} 
+                              className={`py-2 rounded-lg text-[10px] font-bold uppercase transition-colors ${isEditMode ? 'bg-red-600 text-white' : 'bg-red-600/20 hover:bg-red-600/40 text-red-500'}`}
+                           >
+                             {isEditMode ? 'Done Deleting' : 'Delete Apps'}
+                           </button>
+                        </div>
+                        
+                        <div className="bg-black/20 rounded-lg p-2 border border-amber-500/20">
+                            <p className="text-[9px] text-amber-500/80 font-bold uppercase mb-2">Ban Manager</p>
+                            <div className="flex gap-2">
+                                <input 
+                                    value={banInput}
+                                    onChange={e => setBanInput(e.target.value)}
+                                    placeholder="Account Name / ID"
+                                    className="bg-black/50 text-white px-2 py-1.5 rounded-md text-[10px] flex-1 border border-amber-500/30 focus:outline-none focus:border-amber-500"
+                                />
+                                <button
+                                    onClick={() => {
+                                        if (banInput.trim() && onUpdateBannedUsers) {
+                                            onUpdateBannedUsers([...bannedUsers, banInput.trim()]);
+                                            setBanInput('');
+                                        }
+                                    }}
+                                    disabled={!banInput.trim()}
+                                    className="bg-amber-600 text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase disabled:opacity-50"
+                                >
+                                    Ban
+                                </button>
+                            </div>
+                            
+                            {bannedUsers.length > 0 && (
+                                <div className="mt-2 space-y-1 max-h-24 overflow-y-auto pr-1">
+                                    {bannedUsers.map((user, i) => (
+                                        <div key={i} className="flex items-center justify-between bg-black/40 px-2 py-1.5 rounded-md border border-red-500/10">
+                                            <span className="text-[10px] text-white/80 select-all truncate">{user}</span>
+                                            <button 
+                                                onClick={() => {
+                                                    if (onUpdateBannedUsers) {
+                                                        onUpdateBannedUsers(bannedUsers.filter((_, index) => index !== i));
+                                                    }
+                                                }}
+                                                className="text-[9px] text-red-400 hover:text-red-300 font-bold uppercase"
+                                            >
+                                                Unban
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
              </div>
