@@ -46,6 +46,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [adminPin, setAdminPin] = React.useState("");
   const [isAdminUnlocked, setIsAdminUnlocked] = React.useState(false);
+  const [feedback, setFeedback] = React.useState("");
+  const [feedbackSent, setFeedbackSent] = React.useState(false);
+  const [isViewingFeedback, setIsViewingFeedback] = React.useState(false);
+  const [feedbacks, setFeedbacks] = React.useState<{ id: number; text: string; user: string | null; date: string }[]>(() => {
+    try {
+      const stored = localStorage.getItem("plus-launcher-feedback");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleSendFeedback = () => {
+    if (!feedback.trim()) return;
+    const newFb = { id: Date.now(), text: feedback.trim(), user: currentUser || "Anonymous", date: new Date().toLocaleDateString() };
+    const updated = [...feedbacks, newFb];
+    setFeedbacks(updated);
+    localStorage.setItem("plus-launcher-feedback", JSON.stringify(updated));
+    setFeedback("");
+    setFeedbackSent(true);
+    setTimeout(() => setFeedbackSent(false), 3000);
+  };
 
   // Reset admin state when modal closes
   React.useEffect(() => {
@@ -149,6 +171,34 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 className={`absolute top-0.5 left-0.5 h-4 w-4 bg-white rounded-full transition-transform ${isEditMode ? "translate-x-5" : "translate-x-0"}`}
               />
             </button>
+          </div>
+
+          <div className="h-px bg-gray-700" />
+
+          <div className="space-y-3">
+            <p className="text-white text-xs font-medium">App Feedback</p>
+            <div className="flex gap-2">
+              <input
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="What can we improve?..."
+                className="bg-black/50 text-white px-3 py-2 rounded-lg text-xs flex-1 border border-gray-700 focus:outline-none focus:border-blue-500"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSendFeedback();
+                }}
+              />
+              <button
+                onClick={handleSendFeedback}
+                disabled={!feedback.trim()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase disabled:opacity-50 transition-colors"
+                title="Goes straight to Admin Panel"
+              >
+                {feedbackSent ? "Sent!" : "Send"}
+              </button>
+            </div>
+            {feedbackSent && (
+              <p className="text-[10px] text-green-400 font-medium px-1 animate-in fade-in transition-all">Feedback sent to admin panel! Thank you.</p>
+            )}
           </div>
 
           <div className="h-px bg-gray-700" />
@@ -263,25 +313,68 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 animate-in fade-in zoom-in-95">
-                  <button
-                    onClick={() => {
-                      onClose();
-                      if (onAddApp) onAddApp();
-                    }}
-                    className="py-2 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 rounded-lg text-[10px] font-bold uppercase transition-colors"
-                  >
-                    Add App / Icon
-                  </button>
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onToggleEditMode();
-                    }}
-                    className={`py-2 rounded-lg text-[10px] font-bold uppercase transition-colors ${isEditMode ? "bg-red-600 text-white" : "bg-red-600/20 hover:bg-red-600/40 text-red-500"}`}
-                  >
-                    {isEditMode ? "Done Deleting" : "Delete Apps"}
-                  </button>
+                <div className="space-y-3 animate-in fade-in zoom-in-95">
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <button
+                      onClick={() => {
+                        onClose();
+                        if (onAddApp) onAddApp();
+                      }}
+                      className="py-2 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 rounded-lg text-[10px] font-bold uppercase transition-colors"
+                    >
+                      Add App / Icon
+                    </button>
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onToggleEditMode();
+                      }}
+                      className={`py-2 rounded-lg text-[10px] font-bold uppercase transition-colors ${isEditMode ? "bg-red-600 text-white" : "bg-red-600/20 hover:bg-red-600/40 text-red-500"}`}
+                    >
+                      {isEditMode ? "Done Deleting" : "Delete Apps"}
+                    </button>
+                    <button
+                      onClick={() => setIsViewingFeedback(!isViewingFeedback)}
+                      className="col-span-2 py-2 bg-amber-600 border border-amber-500/50 hover:bg-amber-500 text-white shadow-lg shadow-amber-900/20 rounded-lg text-[10px] font-bold uppercase transition-colors"
+                    >
+                      {isViewingFeedback ? "Hide User Feedback" : "View User Feedback"} 
+                    </button>
+                  </div>
+                  
+                  {isViewingFeedback && (
+                    <div className="mt-4 p-3 bg-black/40 border border-gray-700 rounded-xl space-y-3 max-h-48 overflow-y-auto">
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-300 text-[10px] font-bold uppercase tracking-widest">Inbox ({feedbacks.length})</p>
+                        {feedbacks.length > 0 && (
+                            <button
+                                onClick={() => {
+                                    if(confirm("Clear all feedback?")) {
+                                        setFeedbacks([]);
+                                        localStorage.removeItem("plus-launcher-feedback");
+                                    }
+                                }}
+                                className="text-[10px] text-red-400 hover:text-red-300 transition-colors uppercase font-bold"
+                            >
+                                Clear All
+                            </button>
+                        )}
+                      </div>
+                      
+                      {feedbacks.length === 0 ? (
+                        <p className="text-xs text-gray-500 text-center py-4">No feedback received yet.</p>
+                      ) : (
+                        feedbacks.slice().reverse().map(fb => (
+                          <div key={fb.id} className="bg-gray-800/50 border border-gray-700/50 p-2 rounded-lg space-y-1">
+                            <div className="flex justify-between items-start">
+                                <p className="text-[10px] text-blue-400 font-medium">{fb.user}</p>
+                                <p className="text-[9px] text-gray-500">{fb.date}</p>
+                            </div>
+                            <p className="text-xs text-white">{fb.text}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
