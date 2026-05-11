@@ -348,7 +348,7 @@ export default function App() {
     },
     {
       id: "launcher-settings",
-      name: "Launcher Settings",
+      name: "Settings",
       icon: SettingsIcon,
       color: "#475569",
       action: () => setIsSettingsOpen(true),
@@ -433,6 +433,7 @@ export default function App() {
           onLock={
             settings.passwordEnabled ? () => setIsLocked(true) : undefined
           }
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
         <div className="space-y-8">
