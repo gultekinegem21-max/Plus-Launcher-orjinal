@@ -18,6 +18,8 @@ interface SettingsModalProps {
   onAddApp?: () => void;
   bannedUsers?: string[];
   onUpdateBannedUsers?: (users: string[]) => void;
+  currentUser?: string | null;
+  onLogout?: () => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ 
@@ -35,7 +37,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onManageRecovery,
   onAddApp,
   bannedUsers = [],
-  onUpdateBannedUsers
+  onUpdateBannedUsers,
+  currentUser,
+  onLogout
 }) => {
   const [adminPin, setAdminPin] = React.useState('');
   const [isAdminUnlocked, setIsAdminUnlocked] = React.useState(false);
@@ -60,6 +64,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         <div className="p-4 space-y-4">
+          {currentUser && (
+            <>
+                <div className="flex items-center justify-between bg-black/20 p-3 rounded-xl border border-gray-700/50">
+                    <div className="space-y-0.5">
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Active Account</p>
+                        <p className="text-sm font-medium text-white truncate max-w-[150px]">{currentUser}</p>
+                    </div>
+                    {onLogout && (
+                        <button 
+                            onClick={onLogout} 
+                            className="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 py-1.5 rounded border border-red-500/20 text-[10px] font-bold uppercase transition-colors"
+                        >
+                            Sign Out
+                        </button>
+                    )}
+                </div>
+                <div className="h-px bg-gray-700" />
+            </>
+          )}
+
           <div className="flex items-center justify-between">
             <p className="text-white text-xs font-medium">Customization Mode</p>
             <button onClick={onToggleEditMode} className={`h-5 w-10 rounded-full transition-colors relative ${isEditMode ? 'bg-blue-600' : 'bg-gray-700'}`}>
