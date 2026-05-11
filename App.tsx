@@ -6,7 +6,6 @@ import AppCard from "./components/AppCard";
 import AddAppModal from "./components/AddAppModal";
 import LockScreen from "./components/LockScreen";
 import SettingsModal from "./components/SettingsModal";
-import ChatModal from "./components/ChatModal";
 import type { AppItem, StoredApp, LauncherSettings } from "./types";
 import {
   MailIcon,
@@ -25,7 +24,6 @@ import {
   iconMap,
   AppleAppStoreIcon,
   MicrosoftStoreIcon,
-  ChatIcon,
 } from "./components/Icons";
 
 const LOCAL_STORAGE_KEY = "plus-launcher-custom-apps";
@@ -65,7 +63,6 @@ export default function App() {
   const [isFingerprintSetupOpen, setIsFingerprintSetupOpen] = useState(false);
   const [isFaceIdSetupOpen, setIsFaceIdSetupOpen] = useState(false);
   const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<string | null>(() =>
     localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user"),
   );
@@ -350,17 +347,6 @@ export default function App() {
       isCustom: false,
     },
     {
-      id: "chat",
-      name: "Global Chat",
-      icon: ChatIcon,
-      color: "#8b5cf6",
-      action: () => {
-        console.log("Global chat icon clicked. Setting isChatOpen to true");
-        setIsChatOpen(true);
-      },
-      isCustom: false,
-    },
-    {
       id: "launcher-settings",
       name: "Settings",
       icon: SettingsIcon,
@@ -607,8 +593,6 @@ export default function App() {
           setCurrentUser(username);
         }}
       />
-
-      <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }
