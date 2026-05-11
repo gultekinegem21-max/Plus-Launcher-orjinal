@@ -26,5 +26,4 @@ export interface LauncherSettings {
   faceIdReference?: string; // Base64 of the enrolled face
   recoveryQuestion?: string;
   recoveryAnswerHash?: string;
-  bannedUsers?: string[];
 }

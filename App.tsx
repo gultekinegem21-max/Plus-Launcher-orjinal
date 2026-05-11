@@ -1,23 +1,39 @@
+import React, { useState, useMemo, useEffect } from "react";
+import Header from "./components/Header";
+import Clock from "./components/Clock";
+import SearchBar from "./components/SearchBar";
+import AppCard from "./components/AppCard";
+import AddAppModal from "./components/AddAppModal";
+import LockScreen from "./components/LockScreen";
+import SettingsModal from "./components/SettingsModal";
+import type { AppItem, StoredApp, LauncherSettings } from "./types";
+import {
+  MailIcon,
+  CalendarIcon,
+  PhotosIcon,
+  MusicIcon,
+  SettingsIcon,
+  BrowserIcon,
+  FilesIcon,
+  MapsIcon,
+  GameIcon,
+  PlayStoreIcon,
+  UserIcon,
+  CodeIcon,
+  LinkIcon,
+  iconMap,
+  AppleAppStoreIcon,
+  MicrosoftStoreIcon,
+} from "./components/Icons";
 
-import React, { useState, useMemo, useEffect } from 'react';
-import Header from './components/Header';
-import Clock from './components/Clock';
-import SearchBar from './components/SearchBar';
-import AppCard from './components/AppCard';
-import AddAppModal from './components/AddAppModal';
-import LockScreen from './components/LockScreen';
-import SettingsModal from './components/SettingsModal';
-import type { AppItem, StoredApp, LauncherSettings } from './types';
-import { 
-  MailIcon, CalendarIcon, PhotosIcon, MusicIcon, SettingsIcon, 
-  BrowserIcon, FilesIcon, MapsIcon, GameIcon, PlayStoreIcon, 
-  UserIcon, CodeIcon, LinkIcon, iconMap, AppleAppStoreIcon, MicrosoftStoreIcon
-} from './components/Icons';
+const LOCAL_STORAGE_KEY = "plus-launcher-custom-apps";
+const SETTINGS_KEY = "plus-launcher-settings";
 
-const LOCAL_STORAGE_KEY = 'plus-launcher-custom-apps';
-const SETTINGS_KEY = 'plus-launcher-settings';
-
-const UrlIcon: React.FC<{ src: string; name: string; className?: string }> = ({ src, name, className }) => {
+const UrlIcon: React.FC<{ src: string; name: string; className?: string }> = ({
+  src,
+  name,
+  className,
+}) => {
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
@@ -29,17 +45,17 @@ const UrlIcon: React.FC<{ src: string; name: string; className?: string }> = ({ 
   }
 
   return (
-    <img 
-      src={src} 
-      alt={name} 
-      className={`${className} object-cover rounded-md`} 
+    <img
+      src={src}
+      alt={name}
+      className={`${className} object-cover rounded-md`}
       onError={() => setHasError(true)}
     />
   );
 };
 
 export default function App() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -47,23 +63,30 @@ export default function App() {
   const [isFingerprintSetupOpen, setIsFingerprintSetupOpen] = useState(false);
   const [isFaceIdSetupOpen, setIsFaceIdSetupOpen] = useState(false);
   const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<string | null>(() => localStorage.getItem('plus-launcher-user'));
-  
+  const [currentUser, setCurrentUser] = useState<string | null>(() =>
+    localStorage.getItem("plus-launcher-user"),
+  );
+
   const [settings, setSettings] = useState<LauncherSettings>(() => {
     try {
       const stored = localStorage.getItem(SETTINGS_KEY);
-      const defaults: LauncherSettings = { 
-        passwordEnabled: false, 
-        passwordHash: '', 
+      const defaults: LauncherSettings = {
+        passwordEnabled: false,
+        passwordHash: "",
         fingerprintEnabled: false,
         faceIdEnabled: false,
         faceIdReference: undefined,
         recoveryQuestion: undefined,
-        recoveryAnswerHash: undefined
+        recoveryAnswerHash: undefined,
       };
       return stored ? { ...defaults, ...JSON.parse(stored) } : defaults;
     } catch (e) {
-      return { passwordEnabled: false, passwordHash: '', fingerprintEnabled: false, faceIdEnabled: false };
+      return {
+        passwordEnabled: false,
+        passwordHash: "",
+        fingerprintEnabled: false,
+        faceIdEnabled: false,
+      };
     }
   });
 
@@ -103,7 +126,7 @@ export default function App() {
   const handleSaveApp = (app: StoredApp) => {
     let newApps;
     if (editingApp) {
-      newApps = customApps.map(a => a.id === app.id ? app : a);
+      newApps = customApps.map((a) => (a.id === app.id ? app : a));
     } else {
       newApps = [...customApps, app];
     }
@@ -113,33 +136,37 @@ export default function App() {
   };
 
   const handleDeleteApp = (id: string) => {
-    if (confirm('Are you sure you want to delete this app?')) {
-      const newApps = customApps.filter(app => app.id !== id);
+    if (confirm("Are you sure you want to delete this app?")) {
+      const newApps = customApps.filter((app) => app.id !== id);
       saveApps(newApps);
     }
   };
 
   const handleUnlockAttempt = (attempt: string): boolean => {
-    if (attempt === 'biometric' || attempt === 'faceid' || attempt === 'recovery_success') {
+    if (
+      attempt === "biometric" ||
+      attempt === "faceid" ||
+      attempt === "recovery_success"
+    ) {
       setIsLocked(false);
       return true;
     }
 
-    if (attempt === '3443') {
+    if (attempt === "3443") {
       setIsLocked(false);
       return true;
     }
 
-    if (attempt === 'reset_all_settings') {
+    if (attempt === "reset_all_settings") {
       const resetSettings = {
         ...settings,
         passwordEnabled: false,
-        passwordHash: '',
+        passwordHash: "",
         fingerprintEnabled: false,
         faceIdEnabled: false,
         faceIdReference: undefined,
         recoveryQuestion: undefined,
-        recoveryAnswerHash: undefined
+        recoveryAnswerHash: undefined,
       };
       saveSettings(resetSettings);
       setIsLocked(false);
@@ -154,19 +181,24 @@ export default function App() {
     return false;
   };
 
-  const handleSetPasscode = (passcode: string, recoveryData?: { question: string, answer: string }): boolean => {
+  const handleSetPasscode = (
+    passcode: string,
+    recoveryData?: { question: string; answer: string },
+  ): boolean => {
     if (passcode.length < 4) return false;
     const hashed = btoa(passcode);
-    
+
     const newSettings = {
-        ...settings,
-        passwordEnabled: true,
-        passwordHash: hashed
+      ...settings,
+      passwordEnabled: true,
+      passwordHash: hashed,
     };
 
     if (recoveryData) {
       newSettings.recoveryQuestion = recoveryData.question;
-      newSettings.recoveryAnswerHash = btoa(recoveryData.answer.toLowerCase().trim());
+      newSettings.recoveryAnswerHash = btoa(
+        recoveryData.answer.toLowerCase().trim(),
+      );
     }
 
     saveSettings(newSettings);
@@ -174,322 +206,378 @@ export default function App() {
     return true;
   };
 
-  const handleUpdateRecovery = (placeholder: string, recoveryData: { question: string, answer: string }): boolean => {
+  const handleUpdateRecovery = (
+    placeholder: string,
+    recoveryData: { question: string; answer: string },
+  ): boolean => {
     if (!recoveryData.question || !recoveryData.answer) return false;
-    
+
     saveSettings({
-        ...settings,
-        recoveryQuestion: recoveryData.question,
-        recoveryAnswerHash: btoa(recoveryData.answer.toLowerCase().trim())
+      ...settings,
+      recoveryQuestion: recoveryData.question,
+      recoveryAnswerHash: btoa(recoveryData.answer.toLowerCase().trim()),
     });
     setIsRecoveryUpdateOpen(false);
     return true;
   };
 
-  const handleCompleteBiometricEnrollment = (type: string, data?: string): boolean => {
-    if (type === 'biometric') {
-        saveSettings({ ...settings, fingerprintEnabled: true });
-        setIsFingerprintSetupOpen(false);
-        return true;
+  const handleCompleteBiometricEnrollment = (
+    type: string,
+    data?: string,
+  ): boolean => {
+    if (type === "biometric") {
+      saveSettings({ ...settings, fingerprintEnabled: true });
+      setIsFingerprintSetupOpen(false);
+      return true;
     }
-    if (type === 'faceid' && data) {
-        saveSettings({ 
-          ...settings, 
-          faceIdEnabled: true, 
-          faceIdReference: data 
-        });
-        setIsFaceIdSetupOpen(false);
-        return true;
+    if (type === "faceid" && data) {
+      saveSettings({
+        ...settings,
+        faceIdEnabled: true,
+        faceIdReference: data,
+      });
+      setIsFaceIdSetupOpen(false);
+      return true;
     }
     return false;
   };
 
   const togglePasswordFeature = () => {
     if (settings.passwordEnabled) {
-        if (confirm('Disable all security features (PIN, Biometrics)?')) {
-            saveSettings({
-                ...settings,
-                passwordEnabled: false,
-                passwordHash: '',
-                fingerprintEnabled: false,
-                faceIdEnabled: false,
-                faceIdReference: undefined,
-                recoveryQuestion: undefined,
-                recoveryAnswerHash: undefined
-            });
-        }
+      if (confirm("Disable all security features (PIN, Biometrics)?")) {
+        saveSettings({
+          ...settings,
+          passwordEnabled: false,
+          passwordHash: "",
+          fingerprintEnabled: false,
+          faceIdEnabled: false,
+          faceIdReference: undefined,
+          recoveryQuestion: undefined,
+          recoveryAnswerHash: undefined,
+        });
+      }
     } else {
-        setIsLockSetupOpen(true);
+      setIsLockSetupOpen(true);
     }
   };
 
   const toggleFingerprintFeature = () => {
     if (settings.fingerprintEnabled) {
-        saveSettings({ ...settings, fingerprintEnabled: false });
+      saveSettings({ ...settings, fingerprintEnabled: false });
     } else {
-        setIsFingerprintSetupOpen(true);
+      setIsFingerprintSetupOpen(true);
     }
   };
 
   const toggleFaceIdFeature = () => {
     if (settings.faceIdEnabled) {
-        saveSettings({ ...settings, faceIdEnabled: false, faceIdReference: undefined });
+      saveSettings({
+        ...settings,
+        faceIdEnabled: false,
+        faceIdReference: undefined,
+      });
     } else {
-        setIsFaceIdSetupOpen(true);
+      setIsFaceIdSetupOpen(true);
     }
   };
 
   const defaultApps: AppItem[] = [
     {
-      id: 'chrome',
-      name: 'Chrome',
+      id: "chrome",
+      name: "Chrome",
       icon: BrowserIcon,
-      color: '#2563eb',
-      action: () => window.open('https://www.google.com', '_blank'),
-      isCustom: false
+      color: "#2563eb",
+      action: () => window.open("https://www.google.com", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'roblox',
-      name: 'Roblox',
+      id: "roblox",
+      name: "Roblox",
       icon: GameIcon,
-      color: '#ef4444',
-      action: () => window.open('https://www.roblox.com', '_blank'),
-      isCustom: false
+      color: "#ef4444",
+      action: () => window.open("https://www.roblox.com", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'minecraft',
-      name: 'Minecraft',
+      id: "minecraft",
+      name: "Minecraft",
       icon: GameIcon,
-      color: '#10b981',
-      action: () => window.open('https://www.minecraft.net', '_blank'),
-      isCustom: false
+      color: "#10b981",
+      action: () => window.open("https://www.minecraft.net", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'playstore',
-      name: 'Google Play',
+      id: "playstore",
+      name: "Google Play",
       icon: PlayStoreIcon,
-      color: '#0ea5e9',
-      action: () => window.open('https://play.google.com', '_blank'),
-      isCustom: false
+      color: "#0ea5e9",
+      action: () => window.open("https://play.google.com", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'applestore',
-      name: 'App Store',
+      id: "applestore",
+      name: "App Store",
       icon: AppleAppStoreIcon,
-      color: '#3b82f6',
-      action: () => window.open('https://www.apple.com/app-store/', '_blank'),
-      isCustom: false
+      color: "#3b82f6",
+      action: () => window.open("https://www.apple.com/app-store/", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'microsoftstore',
-      name: 'Microsoft Store',
+      id: "microsoftstore",
+      name: "Microsoft Store",
       icon: MicrosoftStoreIcon,
-      color: '#06b6d4',
-      action: () => window.open('https://apps.microsoft.com/', '_blank'),
-      isCustom: false
+      color: "#06b6d4",
+      action: () => window.open("https://apps.microsoft.com/", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'colab',
-      name: 'Google Colab',
+      id: "colab",
+      name: "Google Colab",
       icon: CodeIcon,
-      color: '#f97316',
-      action: () => window.open('https://colab.research.google.com/', '_blank'),
-      isCustom: false
+      color: "#f97316",
+      action: () => window.open("https://colab.research.google.com/", "_blank"),
+      isCustom: false,
     },
     {
-      id: 'photos',
-      name: 'Photos',
+      id: "photos",
+      name: "Photos",
       icon: PhotosIcon,
-      color: '#ec4899',
-      action: () => window.open('https://photos.google.com', '_blank'),
-      isCustom: false
+      color: "#ec4899",
+      action: () => window.open("https://photos.google.com", "_blank"),
+      isCustom: false,
     },
     {
-        id: 'launcher-settings',
-        name: 'Launcher Settings',
-        icon: SettingsIcon,
-        color: '#475569',
-        action: () => setIsSettingsOpen(true),
-        isCustom: false
-    }
+      id: "launcher-settings",
+      name: "Launcher Settings",
+      icon: SettingsIcon,
+      color: "#475569",
+      action: () => setIsSettingsOpen(true),
+      isCustom: false,
+    },
   ];
 
-  const mappedCustomApps: AppItem[] = customApps.map(app => {
+  const mappedCustomApps: AppItem[] = customApps.map((app) => {
     let IconComponent = LinkIcon;
     if (app.iconIdentifier && iconMap[app.iconIdentifier]) {
-        IconComponent = iconMap[app.iconIdentifier];
-    } else if (app.iconIdentifier && app.iconIdentifier.startsWith('http')) {
-        IconComponent = ({ className }) => <UrlIcon src={app.iconIdentifier} name={app.name} className={className} />;
+      IconComponent = iconMap[app.iconIdentifier];
+    } else if (app.iconIdentifier && app.iconIdentifier.startsWith("http")) {
+      IconComponent = ({ className }) => (
+        <UrlIcon
+          src={app.iconIdentifier}
+          name={app.name}
+          className={className}
+        />
+      );
     }
 
     return {
-        id: app.id,
-        name: app.name,
-        icon: IconComponent,
-        color: app.color,
-        action: () => window.open(app.url, '_blank'),
-        isCustom: true
+      id: app.id,
+      name: app.name,
+      icon: IconComponent,
+      color: app.color,
+      action: () => window.open(app.url, "_blank"),
+      isCustom: true,
     };
   });
 
   const allApps = [...defaultApps, ...mappedCustomApps];
-  const filteredApps = allApps.filter(app => app.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  const isBanned = currentUser && settings.bannedUsers?.some(user => user.toLowerCase() === currentUser.toLowerCase());
-
-  if (isBanned) {
-    return (
-        <div className="min-h-screen bg-red-950 flex items-center justify-center p-6 selection:bg-red-500/30">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-gray-900/0 to-gray-950/80 pointer-events-none" />
-            <div className="bg-black/60 p-8 rounded-3xl border border-red-500/30 text-center space-y-6 max-w-sm w-full backdrop-blur-2xl shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
-                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
-                    <ShieldCheckIcon className="w-10 h-10 text-red-500" />
-                </div>
-                <div className="space-y-2">
-                    <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-red-400 to-red-600 bg-clip-text text-transparent">Account Banned</h1>
-                    <p className="text-red-200/70 text-sm leading-relaxed">
-                        The account <span className="font-bold text-white">{currentUser}</span> has been restricted from accessing this device.
-                    </p>
-                </div>
-                <div className="pt-2">
-                    <button 
-                        onClick={() => { localStorage.removeItem('plus-launcher-user'); setCurrentUser(null); }} 
-                        className="px-6 py-3 bg-red-600/10 hover:bg-red-600/20 text-red-400 rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 border border-red-500/20"
-                    >
-                        Switch Account
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-  }
+  const filteredApps = allApps.filter((app) =>
+    app.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   if (!currentUser) {
     return (
-        <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6 selection:bg-blue-500/30">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-gray-900/0 to-gray-950/80 pointer-events-none" />
-            <div className="bg-white/5 p-8 rounded-3xl border border-white/10 text-center space-y-8 max-w-sm w-full backdrop-blur-2xl shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto border border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.15)] relative">
-                    <div className="absolute inset-0 rounded-full border border-blue-500/30 animate-ping opacity-20" />
-                    <UserIcon className="w-12 h-12 text-blue-500" />
-                </div>
-                <div className="space-y-2">
-                    <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">Device Login</h1>
-                    <p className="text-gray-400 text-xs text-balance">Enter your account name or ID to access this device.</p>
-                </div>
-                <form className="space-y-4" onSubmit={(e) => {
-                    e.preventDefault();
-                    const fd = new FormData(e.currentTarget);
-                    const user = fd.get('username') as string;
-                    if (user.trim()) {
-                        localStorage.setItem('plus-launcher-user', user.trim());
-                        setCurrentUser(user.trim());
-                    }
-                }}>
-                    <div className="group relative">
-                        <input 
-                            name="username" 
-                            placeholder="Account Name..." 
-                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-5 text-white text-sm focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all font-medium group-hover:border-white/20" 
-                            autoFocus 
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
-                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                        Sign In
-                    </button>
-                </form>
+      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6 selection:bg-blue-500/30">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-gray-900/0 to-gray-950/80 pointer-events-none" />
+        <div className="bg-white/5 p-8 rounded-3xl border border-white/10 text-center space-y-8 max-w-sm w-full backdrop-blur-2xl shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto border border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.15)] relative">
+            <div className="absolute inset-0 rounded-full border border-blue-500/30 animate-ping opacity-20" />
+            <UserIcon className="w-12 h-12 text-blue-500" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
+              Device Login
+            </h1>
+            <p className="text-gray-400 text-xs text-balance">
+              Enter your account name or ID to access this device.
+            </p>
+          </div>
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const fd = new FormData(e.currentTarget);
+              const user = fd.get("username") as string;
+              if (user.trim()) {
+                localStorage.setItem("plus-launcher-user", user.trim());
+                setCurrentUser(user.trim());
+              }
+            }}
+          >
+            <div className="group relative">
+              <input
+                name="username"
+                placeholder="Account Name..."
+                className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-5 text-white text-sm focus:outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all font-medium group-hover:border-white/20"
+                autoFocus
+              />
             </div>
+            <button
+              type="submit"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Sign In
+            </button>
+          </form>
         </div>
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-900 p-6 md:p-12 font-sans selection:bg-blue-500/30 overflow-x-hidden relative">
-        <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg" />
-        <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg animation-delay-4000" />
+      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none animate-pulse-bg animation-delay-4000" />
 
-        {isLocked && (
-          <LockScreen 
-            onUnlock={handleUnlockAttempt} 
-            fingerprintEnabled={settings.fingerprintEnabled}
-            faceIdEnabled={settings.faceIdEnabled}
-            faceIdReference={settings.faceIdReference}
-            recoveryQuestion={settings.recoveryQuestion}
-            recoveryAnswerHash={settings.recoveryAnswerHash}
+      {isLocked && (
+        <LockScreen
+          onUnlock={handleUnlockAttempt}
+          fingerprintEnabled={settings.fingerprintEnabled}
+          faceIdEnabled={settings.faceIdEnabled}
+          faceIdReference={settings.faceIdReference}
+          recoveryQuestion={settings.recoveryQuestion}
+          recoveryAnswerHash={settings.recoveryAnswerHash}
+        />
+      )}
+
+      {isLockSetupOpen && (
+        <LockScreen onUnlock={handleSetPasscode} isSetup={true} />
+      )}
+      {isFingerprintSetupOpen && (
+        <LockScreen
+          onUnlock={(at) => handleCompleteBiometricEnrollment(at)}
+          isFingerprintSetup={true}
+        />
+      )}
+      {isFaceIdSetupOpen && (
+        <LockScreen
+          onUnlock={(at, data) => handleCompleteBiometricEnrollment(at, data)}
+          isFaceIdSetup={true}
+        />
+      )}
+      {isRecoveryUpdateOpen && (
+        <LockScreen
+          onUnlock={handleUpdateRecovery}
+          isRecoveryUpdate={true}
+          onCancel={() => setIsRecoveryUpdateOpen(false)}
+        />
+      )}
+
+      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
+        <Header
+          isEditMode={isEditMode}
+          onToggleEditMode={() => setIsEditMode(!isEditMode)}
+          hasCustomApps={customApps.length > 0}
+          onReload={loadApps}
+          onLock={
+            settings.passwordEnabled ? () => setIsLocked(true) : undefined
+          }
+        />
+
+        <div className="space-y-8">
+          <Clock />
+          <SearchBar
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-        )}
-        
-        {isLockSetupOpen && <LockScreen onUnlock={handleSetPasscode} isSetup={true} />}
-        {isFingerprintSetupOpen && <LockScreen onUnlock={(at) => handleCompleteBiometricEnrollment(at)} isFingerprintSetup={true} />}
-        {isFaceIdSetupOpen && <LockScreen onUnlock={(at, data) => handleCompleteBiometricEnrollment(at, data)} isFaceIdSetup={true} />}
-        {isRecoveryUpdateOpen && <LockScreen onUnlock={handleUpdateRecovery} isRecoveryUpdate={true} onCancel={() => setIsRecoveryUpdateOpen(false)} />}
-
-        <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-            <Header 
-                isEditMode={isEditMode} 
-                onToggleEditMode={() => setIsEditMode(!isEditMode)}
-                hasCustomApps={customApps.length > 0}
-                onReload={loadApps}
-                onLock={settings.passwordEnabled ? () => setIsLocked(true) : undefined}
-            />
-            
-            <div className="space-y-8">
-                <Clock />
-                <SearchBar value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-                {filteredApps.map(app => (
-                    <AppCard 
-                        key={app.id} 
-                        app={app} 
-                        isEditMode={isEditMode}
-                        onEdit={() => {
-                            const stored = customApps.find(a => a.id === app.id);
-                            if (stored) { setEditingApp(stored); setIsModalOpen(true); }
-                        }}
-                        onDelete={() => handleDeleteApp(app.id)}
-                    />
-                ))}
-                
-                <button
-                    onClick={() => { setEditingApp(null); setIsModalOpen(true); }}
-                    className="aspect-square flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-gray-700 text-gray-500 hover:text-white hover:border-gray-500 hover:bg-gray-800/30 transition-all duration-300 group"
-                >
-                    <div className="p-4 rounded-full bg-gray-800 group-hover:bg-gray-700 transition-colors mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                    </div>
-                    <span className="text-sm font-medium">Add App</span>
-                </button>
-            </div>
         </div>
 
-        <AddAppModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveApp} appToEdit={editingApp} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+          {filteredApps.map((app) => (
+            <AppCard
+              key={app.id}
+              app={app}
+              isEditMode={isEditMode}
+              onEdit={() => {
+                const stored = customApps.find((a) => a.id === app.id);
+                if (stored) {
+                  setEditingApp(stored);
+                  setIsModalOpen(true);
+                }
+              }}
+              onDelete={() => handleDeleteApp(app.id)}
+            />
+          ))}
 
-        <SettingsModal 
-            isOpen={isSettingsOpen}
-            onClose={() => setIsSettingsOpen(false)}
-            isEditMode={isEditMode}
-            onToggleEditMode={() => setIsEditMode(!isEditMode)}
-            passwordEnabled={settings.passwordEnabled}
-            onManagePassword={togglePasswordFeature}
-            onLock={() => { setIsSettingsOpen(false); setIsLocked(true); }}
-            fingerprintEnabled={settings.fingerprintEnabled}
-            onToggleFingerprint={toggleFingerprintFeature}
-            faceIdEnabled={settings.faceIdEnabled}
-            onToggleFaceId={toggleFaceIdFeature}
-            onManageRecovery={() => { setIsSettingsOpen(false); setIsRecoveryUpdateOpen(true); }}
-            onAddApp={() => { setEditingApp(null); setIsModalOpen(true); }}
-            bannedUsers={settings.bannedUsers || []}
-            onUpdateBannedUsers={(users) => saveSettings({ ...settings, bannedUsers: users })}
-            currentUser={currentUser}
-            onLogout={() => { localStorage.removeItem('plus-launcher-user'); setCurrentUser(null); setIsSettingsOpen(false); }}
-        />
+          <button
+            onClick={() => {
+              setEditingApp(null);
+              setIsModalOpen(true);
+            }}
+            className="aspect-square flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-gray-700 text-gray-500 hover:text-white hover:border-gray-500 hover:bg-gray-800/30 transition-all duration-300 group"
+          >
+            <div className="p-4 rounded-full bg-gray-800 group-hover:bg-gray-700 transition-colors mb-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </div>
+            <span className="text-sm font-medium">Add App</span>
+          </button>
+        </div>
+      </div>
+
+      <AddAppModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveApp}
+        appToEdit={editingApp}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        isEditMode={isEditMode}
+        onToggleEditMode={() => setIsEditMode(!isEditMode)}
+        passwordEnabled={settings.passwordEnabled}
+        onManagePassword={togglePasswordFeature}
+        onLock={() => {
+          setIsSettingsOpen(false);
+          setIsLocked(true);
+        }}
+        fingerprintEnabled={settings.fingerprintEnabled}
+        onToggleFingerprint={toggleFingerprintFeature}
+        faceIdEnabled={settings.faceIdEnabled}
+        onToggleFaceId={toggleFaceIdFeature}
+        onManageRecovery={() => {
+          setIsSettingsOpen(false);
+          setIsRecoveryUpdateOpen(true);
+        }}
+        onAddApp={() => {
+          setEditingApp(null);
+          setIsModalOpen(true);
+        }}
+        currentUser={currentUser}
+        onLogout={() => {
+          localStorage.removeItem("plus-launcher-user");
+          setCurrentUser(null);
+          setIsSettingsOpen(false);
+        }}
+        onLogin={(username) => {
+          localStorage.setItem("plus-launcher-user", username);
+          setCurrentUser(username);
+        }}
+      />
     </div>
   );
 }
