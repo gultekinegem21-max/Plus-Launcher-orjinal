@@ -6,6 +6,7 @@ import AppCard from "./components/AppCard";
 import AddAppModal from "./components/AddAppModal";
 import LockScreen from "./components/LockScreen";
 import SettingsModal from "./components/SettingsModal";
+import ChatModal from "./components/ChatModal";
 import type { AppItem, StoredApp, LauncherSettings } from "./types";
 import {
   MailIcon,
@@ -24,6 +25,7 @@ import {
   iconMap,
   AppleAppStoreIcon,
   MicrosoftStoreIcon,
+  ChatIcon,
 } from "./components/Icons";
 
 const LOCAL_STORAGE_KEY = "plus-launcher-custom-apps";
@@ -63,6 +65,7 @@ export default function App() {
   const [isFingerprintSetupOpen, setIsFingerprintSetupOpen] = useState(false);
   const [isFaceIdSetupOpen, setIsFaceIdSetupOpen] = useState(false);
   const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<string | null>(() =>
     localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user"),
   );
@@ -347,6 +350,14 @@ export default function App() {
       isCustom: false,
     },
     {
+      id: "chat",
+      name: "Global Chat",
+      icon: ChatIcon,
+      color: "#8b5cf6",
+      action: () => setIsChatOpen(true),
+      isCustom: false,
+    },
+    {
       id: "launcher-settings",
       name: "Settings",
       icon: SettingsIcon,
@@ -524,9 +535,9 @@ export default function App() {
               setEditingApp(null);
               setIsModalOpen(true);
             }}
-            className="aspect-square flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-gray-700 text-gray-500 hover:text-white hover:border-gray-500 hover:bg-gray-800/30 transition-all duration-300 group"
+            className="aspect-square flex flex-col items-center justify-center p-4 rounded-2xl border border-white/10 text-gray-300 hover:text-white bg-white/5 backdrop-blur-2xl hover:bg-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] transition-all duration-300 group"
           >
-            <div className="p-4 rounded-full bg-gray-800 group-hover:bg-gray-700 transition-colors mb-2">
+            <div className="p-4 rounded-full bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors mb-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8"
@@ -593,6 +604,8 @@ export default function App() {
           setCurrentUser(username);
         }}
       />
+
+      <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }

@@ -30,7 +30,7 @@ const AppCard: React.FC<AppCardProps> = ({ app, isEditMode, onEdit, onDelete }) 
     <div className={`relative ${animationClass}`}>
       <button
         onClick={handleAction}
-        className={`group aspect-square w-full flex flex-col items-center justify-center p-1 sm:p-2 bg-gray-800/40 backdrop-blur-lg rounded-xl border border-gray-700/50 text-white transition-all duration-300 ease-in-out hover:bg-gray-700/60 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${isEditMode && !app.isCustom ? 'opacity-50 hover:translate-y-0 cursor-pointer' : ''}`}
+        className={`group aspect-square w-full flex flex-col items-center justify-center p-1 sm:p-2 bg-white/5 backdrop-blur-2xl rounded-xl border border-white/10 text-white shadow-[0_4px_30px_rgba(0,0,0,0.1)] transition-all duration-300 ease-in-out hover:bg-white/10 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${isEditMode && !app.isCustom ? 'opacity-50 hover:translate-y-0 cursor-pointer' : ''}`}
         style={{ '--app-color': app.color } as React.CSSProperties}
         aria-label={app.name}
       >

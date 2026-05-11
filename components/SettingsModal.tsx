@@ -85,10 +85,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-gray-800 border border-gray-700 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
+        className="bg-gray-900/40 backdrop-blur-3xl border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.4)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-900/20">
+        <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             Settings
           </h2>

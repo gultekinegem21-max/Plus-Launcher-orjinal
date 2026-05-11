@@ -111,7 +111,7 @@ const AddAppModal: React.FC<AddAppModalProps> = ({ isOpen, onClose, onSave, appT
       aria-labelledby="add-app-title"
     >
       <div 
-        className="bg-gray-800/80 border border-gray-700 rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-2xl relative"
+        className="bg-gray-900/50 backdrop-blur-3xl border border-white/10 rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-[0_8px_30px_rgb(0,0,0,0.4)] relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors" aria-label="Close dialog">
@@ -132,7 +132,7 @@ const AddAppModal: React.FC<AddAppModalProps> = ({ isOpen, onClose, onSave, appT
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., My Portfolio"
               required
-              className="w-full bg-gray-900/50 text-white placeholder-gray-500 border border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white/5 backdrop-blur-md text-white placeholder-gray-400 border border-white/10 shadow-inner rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -144,7 +144,7 @@ const AddAppModal: React.FC<AddAppModalProps> = ({ isOpen, onClose, onSave, appT
               onChange={(e) => setUrl(e.target.value)}
               placeholder="e.g., your-website.com"
               required
-              className="w-full bg-gray-900/50 text-white placeholder-gray-500 border border-gray-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white/5 backdrop-blur-md text-white placeholder-gray-400 border border-white/10 shadow-inner rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           
@@ -157,8 +157,8 @@ const AddAppModal: React.FC<AddAppModalProps> = ({ isOpen, onClose, onSave, appT
             </div>
 
             {useFavicon ? (
-                <div className="bg-gray-900/50 p-3 rounded-lg flex items-center gap-4">
-                    <div className="w-12 h-12 flex-shrink-0 bg-gray-700 rounded-lg flex items-center justify-center">
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-3 rounded-lg flex items-center gap-4">
+                    <div className="w-12 h-12 flex-shrink-0 bg-black/20 rounded-lg flex items-center justify-center">
                         {faviconUrl ? (
                             <img src={faviconUrl} alt="Favicon preview" className="w-8 h-8 rounded-md" />
                         ) : (
@@ -171,7 +171,7 @@ const AddAppModal: React.FC<AddAppModalProps> = ({ isOpen, onClose, onSave, appT
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-6 gap-2 bg-gray-900/50 p-2 rounded-lg">
+                <div className="grid grid-cols-6 gap-2 bg-white/5 backdrop-blur-md border border-white/10 p-2 rounded-lg">
                 {iconNames.map(iconName => {
                     const Icon = iconMap[iconName];
                     return (

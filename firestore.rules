@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default-deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    function isValidMessage(data) {
+      return data.keys().hasAll(['text', 'userId', 'userName', 'createdAt'])
+        // Optional key handling
+        && data.keys().hasOnly(['text', 'userId', 'userName', 'photoURL', 'createdAt'])
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 1000
+        && data.userId is string && data.userId == request.auth.uid
+        && data.userName is string && data.userName.size() > 0 && data.userName.size() <= 100
+        && (data.photoURL == null || (data.photoURL is string && data.photoURL.size() <= 500))
+        && data.createdAt == request.time;
+    }
+
+    match /messages/{messageId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(messageId) && isValidMessage(incoming());
+      allow update: if false; // immutable
+      allow delete: if false; // immutable
+    }
+
+  }
+}

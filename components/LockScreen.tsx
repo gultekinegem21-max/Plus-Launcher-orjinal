@@ -237,8 +237,8 @@ const LockScreen: React.FC<LockScreenProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[110] bg-gray-950/98 backdrop-blur-3xl flex flex-col items-center justify-start py-4 px-2 select-none touch-none overflow-hidden">
-      <div className={`absolute inset-0 transition-opacity duration-700 ${isScanning || isVerifying ? 'opacity-30' : 'opacity-0'} ${error ? 'bg-red-600/20' : 'bg-blue-600/20'} blur-[80px] pointer-events-none`} />
+    <div className="fixed inset-0 z-[110] bg-purple-950/40 backdrop-blur-[60px] flex flex-col items-center justify-start py-4 px-2 select-none touch-none overflow-hidden">
+      <div className={`absolute inset-0 transition-opacity duration-700 ${isScanning || isVerifying ? 'opacity-30' : 'opacity-0'} ${error ? 'bg-red-600/20' : 'bg-purple-600/20'} blur-[80px] pointer-events-none`} />
 
       <canvas ref={canvasRef} className="hidden" />
 
