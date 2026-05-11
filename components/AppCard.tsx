@@ -30,14 +30,14 @@ const AppCard: React.FC<AppCardProps> = ({ app, isEditMode, onEdit, onDelete }) 
     <div className={`relative ${animationClass}`}>
       <button
         onClick={handleAction}
-        className={`group aspect-square w-full flex flex-col items-center justify-center p-2 sm:p-4 bg-gray-800/40 backdrop-blur-lg rounded-2xl border border-gray-700/50 text-white transition-all duration-300 ease-in-out hover:bg-gray-700/60 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${isEditMode && !app.isCustom ? 'opacity-50 hover:translate-y-0 cursor-pointer' : ''}`}
+        className={`group aspect-square w-full flex flex-col items-center justify-center p-1 sm:p-2 bg-gray-800/40 backdrop-blur-lg rounded-xl border border-gray-700/50 text-white transition-all duration-300 ease-in-out hover:bg-gray-700/60 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${isEditMode && !app.isCustom ? 'opacity-50 hover:translate-y-0 cursor-pointer' : ''}`}
         style={{ '--app-color': app.color } as React.CSSProperties}
         aria-label={app.name}
       >
-        <div className="p-3 sm:p-4 rounded-xl transition-colors duration-300" style={{ backgroundColor: `${app.color}20` }}>
-          <Icon className="h-8 w-8 sm:h-10 sm:w-10 transition-transform duration-300 group-hover:scale-110" style={{ color: app.color }} />
+        <div className="p-1 sm:p-2 rounded-xl transition-colors duration-300" style={{ backgroundColor: `${app.color}20` }}>
+          <Icon className="h-4 w-4 sm:h-6 sm:w-6 transition-transform duration-300 group-hover:scale-110" style={{ color: app.color }} />
         </div>
-        <span className="mt-2 text-xs sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-300">{app.name}</span>
+        <span className="mt-2 text-[9px] sm:text-[10px] font-medium text-gray-400 group-hover:text-white transition-colors duration-300">{app.name}</span>
       </button>
       {isEditMode && app.isCustom && (
         <div className="absolute -top-2 -right-2 flex gap-1 p-1 z-10">
