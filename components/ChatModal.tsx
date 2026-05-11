@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { auth, db } from "../firebase";
 import {
   signInWithPopup,
+  signInAnonymously,
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
@@ -92,6 +93,14 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     }
   };
 
+  const handleGuestSignIn = async () => {
+    try {
+      await signInAnonymously(auth);
+    } catch (error) {
+      console.error("Guest sign in failed", error);
+    }
+  };
+
   const handleSignOut = () => {
     signOut(auth);
   };
@@ -104,7 +113,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
       await addDoc(collection(db, "messages"), {
         text: newMessage,
         userId: user.uid,
-        userName: user.displayName || "Unknown Person",
+        userName: user.isAnonymous ? "Guest" : (user.displayName || "Unknown Person"),
         photoURL: user.photoURL,
         createdAt: serverTimestamp(),
       });
@@ -172,7 +181,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             </p>
             <button
               onClick={handleSignIn}
-              className="bg-white text-gray-900 hover:bg-gray-200 font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-xl flex items-center gap-2"
+              className="bg-white text-gray-900 hover:bg-gray-200 font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-xl flex items-center gap-2 mb-4"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -193,6 +202,12 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 />
               </svg>
               Sign in with Google
+            </button>
+            <button
+              onClick={handleGuestSignIn}
+              className="text-gray-400 hover:text-white text-sm transition-colors"
+            >
+              Skip sign in and join as Guest
             </button>
           </div>
         ) : (
