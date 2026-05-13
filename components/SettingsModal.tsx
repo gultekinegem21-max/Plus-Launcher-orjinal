@@ -24,6 +24,8 @@ interface SettingsModalProps {
   currentUser?: string | null;
   onLogout?: () => void;
   onLogin?: (username: string, remember: boolean) => void;
+  appIcon?: string;
+  onChangeAppIcon?: (url: string) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -43,6 +45,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   currentUser,
   onLogout,
   onLogin,
+  appIcon,
+  onChangeAppIcon,
 }) => {
   const [adminPin, setAdminPin] = React.useState("");
   const [isAdminUnlocked, setIsAdminUnlocked] = React.useState(false);
@@ -57,6 +61,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       return [];
     }
   });
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [iconUploadSuccess, setIconUploadSuccess] = React.useState(false);
 
   const handleSendFeedback = () => {
     if (!feedback.trim()) return;
@@ -315,6 +321,34 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               ) : (
                 <div className="space-y-3 animate-in fade-in zoom-in-95">
                   <div className="grid grid-cols-2 gap-2 mt-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            if (typeof reader.result === 'string' && onChangeAppIcon) {
+                              onChangeAppIcon(reader.result);
+                              setIconUploadSuccess(true);
+                              setTimeout(() => setIconUploadSuccess(false), 3000);
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        fileInputRef.current?.click();
+                      }}
+                      className={`col-span-2 py-2 border text-white shadow-lg rounded-lg text-[10px] font-bold uppercase transition-colors ${iconUploadSuccess ? 'bg-green-600 border-green-500/50 hover:bg-green-500 shadow-green-900/20' : 'bg-amber-600 border-amber-500/50 hover:bg-amber-500 shadow-amber-900/20'}`}
+                    >
+                      {iconUploadSuccess ? 'Upload Successful!' : 'Change Launcher Logo'}
+                    </button>
                     <button
                       onClick={() => {
                         onClose();
@@ -380,8 +414,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          <div className="text-[8px] text-gray-500 text-center uppercase tracking-widest pt-2">
-            Plus+Launcher v1.5.0
+          <div className="border border-blue-500/30 bg-blue-500/5 rounded-xl p-3 space-y-2 mt-4">
+            <p className="text-blue-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+              App Information
+            </p>
+            <div className="space-y-1 text-xs text-gray-400">
+              <p>Platform: Web / Plus+Launcher</p>
+              <p>Storage: Local Storage</p>
+              <p>Version: 1.5.0</p>
+            </div>
+          </div>
+
+          <div className="text-[8px] text-gray-500 text-center uppercase tracking-widest pt-2 flex flex-col gap-1 mt-4">
+            <span>Plus+Launcher v1.5.0</span>
+            <span className="text-blue-500 font-bold">powered by gultekinegem21max</span>
           </div>
         </div>
       </div>

@@ -237,19 +237,15 @@ const LockScreen: React.FC<LockScreenProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[110] bg-purple-950/40 backdrop-blur-[60px] flex flex-col items-center justify-start py-4 px-2 select-none touch-none overflow-hidden">
-      <div className={`absolute inset-0 transition-opacity duration-700 ${isScanning || isVerifying ? 'opacity-30' : 'opacity-0'} ${error ? 'bg-red-600/20' : 'bg-purple-600/20'} blur-[80px] pointer-events-none`} />
+    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-lg flex items-center justify-center p-4 select-none touch-none overflow-hidden">
+      <div className={`absolute inset-0 transition-opacity duration-700 ${isScanning || isVerifying ? 'opacity-30' : 'opacity-0'} ${error ? 'bg-red-600/20' : 'bg-purple-600/20'} pointer-events-none`} />
 
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className={`transition-all duration-700 origin-top mb-1 ${isFingerprintSetup || isFaceIdSetup || view !== 'unlock' ? 'scale-[0.3] opacity-0 h-0' : 'scale-[0.4] sm:scale-60'}`}>
-        <Clock />
-      </div>
-
-      <div className={`w-full max-w-[320px] flex flex-col items-center space-y-4 transition-all duration-500 ${error ? 'animate-wiggle' : ''} ${success ? 'scale-125 opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`bg-gray-900/80 border border-white/10 p-6 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-2xl flex flex-col items-center w-full max-w-[320px] transition-all duration-500 relative z-10 ${error ? 'animate-wiggle' : ''} ${success ? 'scale-110 opacity-0 pointer-events-none' : 'opacity-100'}`}>
         
         {/* Guard Header */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 mb-4">
           <div className={`p-3 rounded-2xl transition-all duration-300 ${success ? 'bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.5)]' : error ? 'bg-red-600' : isVerifying ? 'bg-amber-600 animate-pulse' : isScanning ? 'bg-blue-600' : 'bg-white/5'} text-white`}>
             {view === 'recovery' ? <MailIcon className="w-8 h-8" /> : isSetup || isRecoveryUpdate ? <ShieldCheckIcon className="w-8 h-8" /> : (isFaceIdSetup || faceIdEnabled) ? <FaceIdIcon className="w-8 h-8" /> : <FingerprintIcon className="w-8 h-8" />}
           </div>

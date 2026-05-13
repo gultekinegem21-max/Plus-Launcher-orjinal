@@ -15,9 +15,10 @@ interface HeaderProps {
     onReload?: () => void;
     onLock?: () => void;
     onOpenSettings?: () => void;
+    appIcon?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ isEditMode, onToggleEditMode, hasCustomApps, onReload, onLock, onOpenSettings }) => {
+const Header: React.FC<HeaderProps> = ({ isEditMode, onToggleEditMode, hasCustomApps, onReload, onLock, onOpenSettings, appIcon }) => {
   const [greeting, setGreeting] = useState(getGreeting());
 
   useEffect(() => {
@@ -30,7 +31,10 @@ const Header: React.FC<HeaderProps> = ({ isEditMode, onToggleEditMode, hasCustom
   return (
     <header className="flex justify-between items-center text-white">
         <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold">Plus<span className="text-blue-500">+</span>Launcher</h1>
+            <div className="flex items-center gap-3">
+                {appIcon && <img src={appIcon} alt="App Icon" className="w-8 h-8 rounded-lg object-cover bg-white/10" />}
+                <h1 className="text-xl font-bold">Plus<span className="text-blue-500">+</span>Launcher</h1>
+            </div>
             <div className="flex items-center gap-2">
                 {hasCustomApps && (
                     <button 

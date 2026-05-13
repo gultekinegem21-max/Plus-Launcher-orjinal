@@ -492,6 +492,7 @@ export default function App() {
             settings.passwordEnabled ? () => setIsLocked(true) : undefined
           }
           onOpenSettings={() => setIsSettingsOpen(true)}
+          appIcon={settings.appIcon}
         />
 
         <div className="space-y-8">
@@ -592,6 +593,8 @@ export default function App() {
           }
           setCurrentUser(username);
         }}
+        appIcon={settings.appIcon}
+        onChangeAppIcon={(url) => saveSettings({ ...settings, appIcon: url })}
       />
     </div>
   );
