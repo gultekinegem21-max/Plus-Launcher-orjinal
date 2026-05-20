@@ -6,6 +6,7 @@ import AppCard from "./components/AppCard";
 import AddAppModal from "./components/AddAppModal";
 import LockScreen from "./components/LockScreen";
 import SettingsModal from "./components/SettingsModal";
+import InstallPrompt from "./components/InstallPrompt";
 import type { AppItem, StoredApp, LauncherSettings } from "./types";
 import {
   MailIcon,
@@ -66,7 +67,6 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<string | null>(() =>
     localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user"),
   );
-
   const [settings, setSettings] = useState<LauncherSettings>(() => {
     try {
       const stored = localStorage.getItem(SETTINGS_KEY);
@@ -89,6 +89,29 @@ export default function App() {
       };
     }
   });
+
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall as any);
+    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstall as any);
+  }, []);
+
+  useEffect(() => {
+    if (settings.appIcon) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = settings.appIcon;
+    }
+  }, [settings.appIcon]);
 
   const [isLocked, setIsLocked] = useState(() => {
     return !!(settings.passwordEnabled && settings.passwordHash);
@@ -392,7 +415,15 @@ export default function App() {
         <div className="bg-white/5 p-8 rounded-3xl border border-white/10 text-center space-y-8 max-w-sm w-full backdrop-blur-2xl shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div className="w-24 h-24 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto border border-blue-500/20 shadow-[0_0_40px_rgba(59,130,246,0.15)] relative">
             <div className="absolute inset-0 rounded-full border border-blue-500/30 animate-ping opacity-20" />
-            <UserIcon className="w-12 h-12 text-blue-500" />
+            {settings.appIcon ? (
+              <img
+                src={settings.appIcon}
+                alt="App Logo"
+                className="w-14 h-14 rounded-2xl object-cover bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10"
+              />
+            ) : (
+              <UserIcon className="w-12 h-12 text-blue-500 relative z-10" />
+            )}
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
@@ -456,22 +487,25 @@ export default function App() {
           faceIdReference={settings.faceIdReference}
           recoveryQuestion={settings.recoveryQuestion}
           recoveryAnswerHash={settings.recoveryAnswerHash}
+          appIcon={settings.appIcon}
         />
       )}
 
       {isLockSetupOpen && (
-        <LockScreen onUnlock={handleSetPasscode} isSetup={true} />
+        <LockScreen onUnlock={handleSetPasscode} isSetup={true} appIcon={settings.appIcon} />
       )}
       {isFingerprintSetupOpen && (
         <LockScreen
           onUnlock={(at) => handleCompleteBiometricEnrollment(at)}
           isFingerprintSetup={true}
+          appIcon={settings.appIcon}
         />
       )}
       {isFaceIdSetupOpen && (
         <LockScreen
           onUnlock={(at, data) => handleCompleteBiometricEnrollment(at, data)}
           isFaceIdSetup={true}
+          appIcon={settings.appIcon}
         />
       )}
       {isRecoveryUpdateOpen && (
@@ -479,6 +513,7 @@ export default function App() {
           onUnlock={handleUpdateRecovery}
           isRecoveryUpdate={true}
           onCancel={() => setIsRecoveryUpdateOpen(false)}
+          appIcon={settings.appIcon}
         />
       )}
 
@@ -596,6 +631,13 @@ export default function App() {
         appIcon={settings.appIcon}
         onChangeAppIcon={(url) => saveSettings({ ...settings, appIcon: url })}
       />
+
+      {currentUser && !isLocked && (
+        <InstallPrompt
+          appIcon={settings.appIcon}
+          deferredPrompt={deferredPrompt}
+        />
+      )}
     </div>
   );
 }

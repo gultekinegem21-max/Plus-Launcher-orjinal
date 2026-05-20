@@ -17,10 +17,11 @@ interface LockScreenProps {
   faceIdReference?: string;
   recoveryQuestion?: string;
   recoveryAnswerHash?: string;
+  appIcon?: string;
 }
 
 const LockScreen: React.FC<LockScreenProps> = ({ 
-    onUnlock, isSetup, isFingerprintSetup, isFaceIdSetup, isRecoveryUpdate, onCancel, fingerprintEnabled, faceIdEnabled, faceIdReference, recoveryQuestion, recoveryAnswerHash
+    onUnlock, isSetup, isFingerprintSetup, isFaceIdSetup, isRecoveryUpdate, onCancel, fingerprintEnabled, faceIdEnabled, faceIdReference, recoveryQuestion, recoveryAnswerHash, appIcon
 }) => {
   const [view, setView] = useState<'unlock' | 'recovery' | 'setup-recovery' | 'reset'>(
     isRecoveryUpdate ? 'setup-recovery' : 'unlock'
@@ -250,6 +251,13 @@ const LockScreen: React.FC<LockScreenProps> = ({
         
         {/* Guard Header */}
         <div className="flex flex-col items-center gap-2">
+          {appIcon && (
+            <img 
+              src={appIcon} 
+              alt="Launcher Logo" 
+              className="w-12 h-12 rounded-xl object-cover border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] mb-1" 
+            />
+          )}
           <div className={`p-3 rounded-2xl transition-all duration-300 ${success ? 'bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.5)]' : error ? 'bg-red-600' : isVerifying ? 'bg-amber-600 animate-pulse' : isScanning ? 'bg-blue-600' : 'bg-white/5'} text-white`}>
             {view === 'recovery' ? <MailIcon className="w-8 h-8" /> : isSetup || isRecoveryUpdate ? <ShieldCheckIcon className="w-8 h-8" /> : (isFaceIdSetup || faceIdEnabled) ? <FaceIdIcon className="w-8 h-8" /> : <FingerprintIcon className="w-8 h-8" />}
           </div>

@@ -32,7 +32,13 @@ const Header: React.FC<HeaderProps> = ({ isEditMode, onToggleEditMode, hasCustom
     <header className="flex justify-between items-center text-white">
         <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-                {appIcon && <img src={appIcon} alt="App Icon" className="w-8 h-8 rounded-lg object-cover bg-white/10" />}
+                {appIcon ? (
+                    <img src={appIcon} alt="App Icon" className="w-8 h-8 rounded-lg object-cover bg-white/10" />
+                ) : (
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 text-md shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                        +
+                    </div>
+                )}
                 <h1 className="text-xl font-bold">Plus<span className="text-blue-500">+</span>Launcher</h1>
             </div>
             <div className="flex items-center gap-2">
