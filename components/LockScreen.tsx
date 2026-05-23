@@ -243,11 +243,11 @@ const LockScreen: React.FC<LockScreenProps> = ({
 
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className={`transition-all duration-700 origin-top mb-1 ${isFingerprintSetup || isFaceIdSetup || view !== 'unlock' ? 'scale-[0.3] opacity-0 h-0' : 'scale-[0.65] sm:scale-75 mt-8 mb-4'}`}>
+      <div className={`transition-all duration-700 origin-top mb-1 ${isFingerprintSetup || isFaceIdSetup || view !== 'unlock' ? 'scale-[0.3] opacity-0 h-0' : 'scale-[0.5] sm:scale-[0.6] mt-4 mb-2'}`}>
         <Clock />
       </div>
 
-      <div className={`w-full max-w-[280px] scale-[0.85] flex flex-col items-center space-y-3 transition-all duration-500 ${error ? 'animate-wiggle' : ''} ${success ? 'scale-[1.1] opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`w-full max-w-[260px] scale-[0.75] origin-top flex flex-col items-center space-y-2 transition-all duration-500 ${error ? 'animate-wiggle' : ''} ${success ? 'scale-100 opacity-0 pointer-events-none' : 'opacity-100'}`}>
         
         {/* Guard Header */}
         <div className="flex flex-col items-center gap-2">
@@ -315,13 +315,13 @@ const LockScreen: React.FC<LockScreenProps> = ({
                             <div key={i} className={`w-3 h-3 rounded-full border transition-all ${i < input.length ? 'bg-blue-500 border-blue-500 scale-110 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'border-white/10 bg-transparent'}`} />
                         ))}
                     </div>
-                    <div className="grid grid-cols-3 gap-2 w-full max-w-[220px]">
+                    <div className="grid grid-cols-3 gap-1 w-full max-w-[180px]">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                            <button key={num} onClick={() => handleKeypad(num.toString())} className="aspect-square rounded-2xl bg-white/5 text-white text-xl font-bold border border-white/5 active:bg-blue-600/30 transition-colors">{num}</button>
+                            <button key={num} onClick={() => handleKeypad(num.toString())} className="aspect-square rounded-xl bg-white/5 text-white text-lg font-bold border border-white/5 active:bg-blue-600/30 transition-colors">{num}</button>
                         ))}
-                        <button onClick={handleBackspace} className="aspect-square flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-white/40 active:text-white transition-colors"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth={2.5} d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.37-6.37a2.25 2.25 0 010-3.18l6.37-6.37A2.25 2.25 0 0110.47 2.25h10.28c1.242 0 2.25 1.008 2.25 2.25v15a2.25 2.25 0 01-2.25 2.25H10.47a2.25 2.25 0 01-1.47-.58z" /></svg></button>
-                        <button onClick={() => handleKeypad('0')} className="aspect-square rounded-2xl bg-white/5 text-white text-xl font-bold border border-white/5 active:bg-blue-600/30 transition-colors">0</button>
-                        <button onClick={handleUnlock} disabled={input.length < 4} className="aspect-square flex items-center justify-center rounded-2xl bg-blue-600 text-white active:scale-95 disabled:opacity-5 transition-all shadow-lg shadow-blue-500/20"><svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></button>
+                        <button onClick={handleBackspace} className="aspect-square flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-white/40 active:text-white transition-colors"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth={2.5} d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.37-6.37a2.25 2.25 0 010-3.18l6.37-6.37A2.25 2.25 0 0110.47 2.25h10.28c1.242 0 2.25 1.008 2.25 2.25v15a2.25 2.25 0 01-2.25 2.25H10.47a2.25 2.25 0 01-1.47-.58z" /></svg></button>
+                        <button onClick={() => handleKeypad('0')} className="aspect-square rounded-xl bg-white/5 text-white text-lg font-bold border border-white/5 active:bg-blue-600/30 transition-colors">0</button>
+                        <button onClick={handleUnlock} disabled={input.length < 4} className="aspect-square flex items-center justify-center rounded-xl bg-blue-600 text-white active:scale-95 disabled:opacity-5 transition-all shadow-lg shadow-blue-500/20"><svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></button>
                     </div>
                     
                     {!isSetup && (
