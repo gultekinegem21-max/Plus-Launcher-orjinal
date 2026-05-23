@@ -159,9 +159,18 @@ export default function App() {
   };
 
   const handleDeleteApp = (id: string) => {
+    if (id === "launcher-settings") return;
     if (confirm("Are you sure you want to delete this app?")) {
-      const newApps = customApps.filter((app) => app.id !== id);
-      saveApps(newApps);
+      const isDefault = defaultApps.some(app => app.id === id);
+      if (isDefault) {
+        saveSettings({
+          ...settings,
+          deletedApps: [...(settings.deletedApps || []), id],
+        });
+      } else {
+        const newApps = customApps.filter((app) => app.id !== id);
+        saveApps(newApps);
+      }
     }
   };
 
@@ -405,6 +414,7 @@ export default function App() {
 
   const allApps = [...defaultApps, ...mappedCustomApps];
   const filteredApps = allApps.filter((app) =>
+    !settings.deletedApps?.includes(app.id) &&
     app.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
