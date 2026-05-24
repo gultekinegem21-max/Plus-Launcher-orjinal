@@ -23,6 +23,10 @@ service cloud.firestore {
         && data.createdAt == request.time;
     }
 
+    match /globals/{globalDoc} {
+      allow read, write: if true;
+    }
+
     match /messages/{messageId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && isValidId(messageId) && isValidMessage(incoming());

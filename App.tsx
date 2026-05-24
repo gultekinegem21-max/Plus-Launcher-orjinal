@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { db } from "./firebase";
 import Header from "./components/Header";
 import Clock from "./components/Clock";
 import SearchBar from "./components/SearchBar";
@@ -142,9 +144,29 @@ export default function App() {
   };
 
   const saveSettings = (newSettings: LauncherSettings) => {
+    if (newSettings.appIcon !== settings.appIcon) {
+      setDoc(doc(db, "globals", "settings"), { appIcon: newSettings.appIcon }, { merge: true }).catch(console.error);
+    }
     setSettings(newSettings);
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(newSettings));
   };
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "globals", "settings"), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.appIcon) {
+          setSettings((prev) => {
+            if (prev.appIcon === data.appIcon) return prev;
+            const newSettings = { ...prev, appIcon: data.appIcon };
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(newSettings));
+            return newSettings;
+          });
+        }
+      }
+    });
+    return unsub;
+  }, []);
 
   const handleSaveApp = (app: StoredApp) => {
     let newApps;
