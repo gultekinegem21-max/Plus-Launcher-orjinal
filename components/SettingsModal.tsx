@@ -421,6 +421,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-1 text-xs text-gray-400">
               <p>Platform: Web / Plus+Launcher</p>
               <p>Storage: Local Storage</p>
+              <p>URL: plus-launcher.vercel.app</p>
               <p>Version: 1.5.0</p>
             </div>
           </div>
