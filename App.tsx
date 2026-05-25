@@ -66,6 +66,8 @@ export default function App() {
   const [isFingerprintSetupOpen, setIsFingerprintSetupOpen] = useState(false);
   const [isFaceIdSetupOpen, setIsFaceIdSetupOpen] = useState(false);
   const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const [currentUser, setCurrentUser] = useState<string | null>(() =>
     localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user"),
   );
@@ -459,47 +461,107 @@ export default function App() {
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
-              Device Login
+              {isCreatingAccount ? "Create Account" : "Device Login"}
             </h1>
             <p className="text-gray-400 text-xs text-balance">
-              Enter your account name or ID to access this device.
+              {isCreatingAccount 
+                ? "Enter a username and password to create a new Plus account." 
+                : "Enter your account name or ID to access this app."}
             </p>
           </div>
           <form
-            className="space-y-4"
+            className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
+              setLoginError("");
               const fd = new FormData(e.currentTarget);
               const user = fd.get("username") as string;
+              const password = fd.get("password") as string;
               const rememberMe = fd.get("rememberMe") === "on";
-              if (user.trim()) {
-                if (rememberMe) {
-                  localStorage.setItem("plus-launcher-user", user.trim());
+              
+              if (user.trim() && password.trim()) {
+                const accountsStr = localStorage.getItem("plus-launcher-accounts") || "{}";
+                const accounts = JSON.parse(accountsStr);
+                
+                if (isCreatingAccount) {
+                  if (accounts[user.trim()]) {
+                     setLoginError("Account already exists.");
+                     return;
+                  }
+                  accounts[user.trim()] = password.trim();
+                  localStorage.setItem("plus-launcher-accounts", JSON.stringify(accounts));
+                  setIsCreatingAccount(false);
+                  
+                  if (rememberMe) {
+                    localStorage.setItem("plus-launcher-user", user.trim());
+                  } else {
+                    sessionStorage.setItem("plus-launcher-user", user.trim());
+                  }
+                  setCurrentUser(user.trim());
                 } else {
-                  sessionStorage.setItem("plus-launcher-user", user.trim());
+                  if (accounts[user.trim()] && accounts[user.trim()] === password.trim()) {
+                    if (rememberMe) {
+                      localStorage.setItem("plus-launcher-user", user.trim());
+                    } else {
+                      sessionStorage.setItem("plus-launcher-user", user.trim());
+                    }
+                    setCurrentUser(user.trim());
+                  } else {
+                    setLoginError("Invalid username or password.");
+                  }
                 }
-                setCurrentUser(user.trim());
               }
             }}
           >
-            <div className="flex items-center group relative bg-black/50 border border-white/10 rounded-2xl transition-all focus-within:border-blue-500/50 focus-within:bg-blue-500/5 hover:border-white/20">
-              <input
-                name="username"
-                placeholder="Account Name..."
-                className="flex-1 bg-transparent py-4 px-5 text-white text-sm focus:outline-none font-medium"
-                autoFocus
-              />
-              <div className="flex items-center gap-2 pr-5 pl-4 border-l border-white/10 h-8 mt-1 mb-1">
-                  <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4 rounded border-white/10 bg-black/50 accent-blue-500" defaultChecked />
-                  <label htmlFor="rememberMe" className="text-gray-400 text-[10px] uppercase font-bold tracking-widest cursor-pointer select-none whitespace-nowrap">Save</label>
+            {loginError && (
+              <p className="text-red-400 text-xs text-center font-medium bg-red-500/10 py-2 rounded-lg border border-red-500/20">{loginError}</p>
+            )}
+            <div className="flex flex-col gap-0 border border-white/10 rounded-2xl bg-black/50 focus-within:border-blue-500/50 hover:border-white/20 transition-all overflow-hidden relative">
+              <div className="flex items-center group relative border-b border-white/5 transition-all focus-within:bg-blue-500/5">
+                <input
+                  name="username"
+                  placeholder="Account Name..."
+                  className="flex-1 bg-transparent py-4 px-5 text-white text-sm focus:outline-none font-medium"
+                  autoFocus
+                  required
+                />
+                <div className="flex items-center gap-2 pr-5 pl-4 border-l border-white/10 h-8 mt-1 mb-1">
+                    <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4 rounded border-white/10 bg-black/50 accent-blue-500" defaultChecked />
+                    <label htmlFor="rememberMe" className="text-gray-400 text-[10px] uppercase font-bold tracking-widest cursor-pointer select-none whitespace-nowrap">Save</label>
+                </div>
+              </div>
+              <div className="flex items-center group relative transition-all focus-within:bg-blue-500/5">
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Password..."
+                  className="flex-1 bg-transparent py-4 px-5 text-white text-sm focus:outline-none font-medium"
+                  required
+                />
               </div>
             </div>
             <button
               type="submit"
               className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] active:scale-[0.98]"
             >
-              Sign In
+              {isCreatingAccount ? "Create Account" : "Sign In"}
             </button>
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCreatingAccount(!isCreatingAccount);
+                  setLoginError("");
+                }}
+                className="text-gray-400 text-[11px] hover:text-white transition-colors"
+              >
+                {isCreatingAccount ? (
+                  <>Already have a Plus account? <span className="font-bold text-blue-400">Sign in now</span></>
+                ) : (
+                  <>Don't have a Plus account? <span className="font-bold text-blue-400">Create one now</span></>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>
