@@ -68,6 +68,7 @@ export default function App() {
   const [isRecoveryUpdateOpen, setIsRecoveryUpdateOpen] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState<string | null>(() =>
     localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user"),
   );
@@ -469,10 +470,12 @@ export default function App() {
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-white uppercase tracking-widest bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
-              {isCreatingAccount ? "Create Account" : "Device Login"}
+              {isForgotPassword ? "Recover Account" : isCreatingAccount ? "Create Account" : "Device Login"}
             </h1>
             <p className="text-gray-400 text-xs text-balance">
-              {isCreatingAccount 
+              {isForgotPassword 
+                ? "Enter your account name and the last password you remember to create a new one."
+                : isCreatingAccount 
                 ? "Enter a username and password to create a new Plus account." 
                 : "Enter your account name or ID to access this app."}
             </p>
@@ -484,12 +487,33 @@ export default function App() {
               setLoginError("");
               const fd = new FormData(e.currentTarget);
               const user = fd.get("username") as string;
+              
+              const accountsStr = localStorage.getItem("plus-launcher-accounts") || "{}";
+              const accounts = JSON.parse(accountsStr);
+
+              if (isForgotPassword) {
+                const lastPassword = fd.get("lastPassword") as string;
+                const newPassword = fd.get("password") as string;
+                if (!accounts[user.trim()]) {
+                  setLoginError("Account does not exist.");
+                  return;
+                }
+                if (!lastPassword.trim() || !newPassword.trim()) {
+                  setLoginError("Please fill out all fields.");
+                  return;
+                }
+                
+                accounts[user.trim()] = newPassword.trim();
+                localStorage.setItem("plus-launcher-accounts", JSON.stringify(accounts));
+                setIsForgotPassword(false);
+                setLoginError("Password updated successfully. Please sign in.");
+                return;
+              }
+
               const password = fd.get("password") as string;
               const rememberMe = fd.get("rememberMe") === "on";
               
               if (user.trim() && password.trim()) {
-                const accountsStr = localStorage.getItem("plus-launcher-accounts") || "{}";
-                const accounts = JSON.parse(accountsStr);
                 
                 if (isCreatingAccount) {
                   if (accounts[user.trim()]) {
@@ -533,37 +557,74 @@ export default function App() {
                   autoFocus
                   required
                 />
-                <div className="flex items-center gap-2 pr-5 pl-4 border-l border-white/10 h-8 mt-1 mb-1">
-                    <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4 rounded border-white/10 bg-black/50 accent-blue-500" defaultChecked />
-                    <label htmlFor="rememberMe" className="text-gray-400 text-[10px] uppercase font-bold tracking-widest cursor-pointer select-none whitespace-nowrap">Save</label>
-                </div>
+                {!isForgotPassword && (
+                  <div className="flex items-center gap-2 pr-5 pl-4 border-l border-white/10 h-8 mt-1 mb-1">
+                      <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4 rounded border-white/10 bg-black/50 accent-blue-500" defaultChecked />
+                      <label htmlFor="rememberMe" className="text-gray-400 text-[10px] uppercase font-bold tracking-widest cursor-pointer select-none whitespace-nowrap">Save</label>
+                  </div>
+                )}
               </div>
+              
+              {isForgotPassword && (
+                <div className="flex items-center group relative border-b border-white/5 transition-all focus-within:bg-blue-500/5">
+                  <input
+                    name="lastPassword"
+                    type="password"
+                    placeholder="Last Password You Remember..."
+                    className="flex-1 bg-transparent py-4 px-5 text-white text-sm focus:outline-none font-medium"
+                    required
+                  />
+                </div>
+              )}
+
               <div className="flex items-center group relative transition-all focus-within:bg-blue-500/5">
                 <input
                   name="password"
                   type="password"
-                  placeholder="Password..."
+                  placeholder={isForgotPassword ? "New Password..." : "Password..."}
                   className="flex-1 bg-transparent py-4 px-5 text-white text-sm focus:outline-none font-medium"
                   required
                 />
               </div>
             </div>
+            
+            {(!isCreatingAccount && !isForgotPassword) && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsForgotPassword(true);
+                    setLoginError("");
+                  }}
+                  className="text-[10px] text-gray-500 hover:text-white uppercase tracking-widest font-bold transition-colors"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
               className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] active:scale-[0.98]"
             >
-              {isCreatingAccount ? "Create Account" : "Sign In"}
+              {isForgotPassword ? "Reset Password" : isCreatingAccount ? "Create Account" : "Sign In"}
             </button>
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 flex flex-col gap-3">
               <button
                 type="button"
                 onClick={() => {
-                  setIsCreatingAccount(!isCreatingAccount);
+                  if (isForgotPassword) {
+                    setIsForgotPassword(false);
+                  } else {
+                    setIsCreatingAccount(!isCreatingAccount);
+                  }
                   setLoginError("");
                 }}
                 className="text-gray-400 text-[11px] hover:text-white transition-colors"
               >
-                {isCreatingAccount ? (
+                {isForgotPassword ? (
+                  <>Remember your password? <span className="font-bold text-blue-400">Sign in now</span></>
+                ) : isCreatingAccount ? (
                   <>Already have a Plus account? <span className="font-bold text-blue-400">Sign in now</span></>
                 ) : (
                   <>Don't have a Plus account? <span className="font-bold text-blue-400">Create one now</span></>
