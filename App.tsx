@@ -118,8 +118,16 @@ export default function App() {
   }, [settings.appIcon]);
 
   const [isLocked, setIsLocked] = useState(() => {
+    const user = localStorage.getItem("plus-launcher-user") || sessionStorage.getItem("plus-launcher-user");
+    if (user === "Admin Plus+") return false;
     return !!(settings.passwordEnabled && settings.passwordHash);
   });
+
+  useEffect(() => {
+    if (currentUser === "Admin Plus+") {
+      setIsLocked(false);
+    }
+  }, [currentUser]);
 
   const [customApps, setCustomApps] = useState<StoredApp[]>([]);
   const [editingApp, setEditingApp] = useState<StoredApp | null>(null);
