@@ -26,6 +26,8 @@ interface SettingsModalProps {
   onLogin?: (username: string, remember: boolean) => void;
   appIcon?: string;
   onChangeAppIcon?: (url: string) => void;
+  appName?: string;
+  onChangeAppName?: (name: string) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -47,6 +49,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onLogin,
   appIcon,
   onChangeAppIcon,
+  appName,
+  onChangeAppName,
 }) => {
   const [adminPin, setAdminPin] = React.useState("");
   const [isAdminUnlocked, setIsAdminUnlocked] = React.useState(false);
@@ -320,6 +324,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-3 animate-in fade-in zoom-in-95">
+                  <div className="flex flex-col gap-2 mt-2">
+                    <label className="text-white text-[10px] font-bold uppercase tracking-widest pl-1">
+                      Launcher Name
+                    </label>
+                    <input
+                      type="text"
+                      value={appName || ""}
+                      onChange={(e) => onChangeAppName && onChangeAppName(e.target.value)}
+                      placeholder="Plus+Launcher"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500/50 transition-colors"
+                    />
+                  </div>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <input
                       type="file"

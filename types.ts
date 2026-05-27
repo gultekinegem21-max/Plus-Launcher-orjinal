@@ -27,5 +27,6 @@ export interface LauncherSettings {
   recoveryQuestion?: string;
   recoveryAnswerHash?: string;
   appIcon?: string;
+  appName?: string;
   deletedApps?: string[];
 }
