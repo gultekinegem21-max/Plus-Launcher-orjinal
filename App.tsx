@@ -113,24 +113,64 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Update the live DOM icon for the preview tab only
-    const iconUrl = settings.appIcon || "/icon.png";
-    
-    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'icon';
-      document.getElementsByTagName('head')[0].appendChild(link);
-    }
-    link.href = iconUrl;
+    if (settings.appIcon || settings.appName) {
+      if (settings.appIcon) {
+        let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        link.href = settings.appIcon;
 
-    let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
-    if (!appleLink) {
-      appleLink = document.createElement('link');
-      appleLink.rel = 'apple-touch-icon';
-      document.getElementsByTagName('head')[0].appendChild(appleLink);
+        let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
+        if (!appleLink) {
+          appleLink = document.createElement('link');
+          appleLink.rel = 'apple-touch-icon';
+          document.getElementsByTagName('head')[0].appendChild(appleLink);
+        }
+        appleLink.href = settings.appIcon;
+      }
+
+      const manifest = {
+        name: settings.appName || "Plus+Launcher",
+        short_name: settings.appName || "Plus+Launcher",
+        start_url: window.location.origin + "/",
+        display: "standalone",
+        background_color: "#111827",
+        theme_color: "#1e3a8a",
+        icons: [
+          {
+            src: settings.appIcon ? new URL(settings.appIcon, window.location.href).href : 'https://ui-avatars.com/api/?name=Plus+Launcher&size=512&background=1e3a8a&color=fff',
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
+          },
+          {
+            src: settings.appIcon ? new URL(settings.appIcon, window.location.href).href : 'https://ui-avatars.com/api/?name=Plus+Launcher&size=192&background=1e3a8a&color=fff',
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable"
+          }
+        ]
+      };
+      
+      const manifestString = JSON.stringify(manifest);
+      const manifestDataUrl = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(manifestString)}`;
+      
+      let manifestLink: HTMLLinkElement | null = document.querySelector("link[rel='manifest']");
+      if (!manifestLink) {
+        manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        document.getElementsByTagName('head')[0].appendChild(manifestLink);
+      }
+      
+      // Cleanup previous blob URL if any
+      if (manifestLink.href && manifestLink.href.startsWith("blob:")) {
+        URL.revokeObjectURL(manifestLink.href);
+      }
+      manifestLink.href = manifestDataUrl;
     }
-    appleLink.href = iconUrl;
   }, [settings.appIcon, settings.appName]);
 
   const [isLocked, setIsLocked] = useState(() => {
