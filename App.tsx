@@ -113,15 +113,82 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (settings.appIcon || settings.appName) {
-      if (settings.appIcon) {
+    const updatePWA = async () => {
+      try {
+        const appName = settings.appName || "Plus+Launcher";
+        let iconUrl_192 = `/icon-192.png`;
+        let iconUrl_512 = `/icon-512.png`;
+        let iconType = 'image/png';
+        
+        if (settings.appIcon && settings.appIcon.startsWith('data:')) {
+          const res = await fetch(settings.appIcon);
+          const blob = await res.blob();
+          iconType = blob.type || 'image/png';
+          
+          if ('caches' in window) {
+            const cache = await caches.open('dynamic-pwa');
+            await cache.put('/dynamic-icon-192.png', new Response(blob, { headers: { 'Content-Type': iconType } }));
+            await cache.put('/dynamic-icon-512.png', new Response(blob, { headers: { 'Content-Type': iconType } }));
+            iconUrl_192 = '/dynamic-icon-192.png';
+            iconUrl_512 = '/dynamic-icon-512.png';
+          }
+        } else if (settings.appIcon) {
+           iconUrl_192 = settings.appIcon;
+           iconUrl_512 = settings.appIcon;
+        }
+
+        const manifest = {
+          name: appName,
+          short_name: appName,
+          start_url: window.location.origin + "/",
+          display: "standalone",
+          background_color: "#111827",
+          theme_color: "#1e3a8a",
+          icons: [
+            {
+              src: iconUrl_192,
+              sizes: "192x192",
+              type: iconType,
+              purpose: "any maskable"
+            },
+            {
+              src: iconUrl_512,
+              sizes: "512x512",
+              type: iconType,
+              purpose: "any maskable"
+            }
+          ]
+        };
+
+        let manifestUrl = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify(manifest))}`;
+
+        if ('caches' in window) {
+          const manifestStr = JSON.stringify(manifest);
+          const cache = await caches.open('dynamic-pwa');
+          await cache.put('/dynamic-manifest.json', new Response(manifestStr, { headers: { 'Content-Type': 'application/manifest+json' } }));
+          manifestUrl = `/dynamic-manifest.json?v=${Date.now()}`;
+        }
+
+        let manifestLink: HTMLLinkElement | null = document.querySelector("link[rel='manifest']");
+        if (!manifestLink) {
+          manifestLink = document.createElement('link');
+          manifestLink.rel = 'manifest';
+          document.getElementsByTagName('head')[0].appendChild(manifestLink);
+        }
+        
+        if (manifestLink.href && manifestLink.href.startsWith("blob:")) {
+          URL.revokeObjectURL(manifestLink.href);
+        }
+        manifestLink.href = manifestUrl;
+        
+        // Also update the favicon
         let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
         if (!link) {
           link = document.createElement('link');
           link.rel = 'icon';
           document.getElementsByTagName('head')[0].appendChild(link);
         }
-        link.href = settings.appIcon;
+        link.href = settings.appIcon || iconUrl_192;
 
         let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
         if (!appleLink) {
@@ -129,48 +196,14 @@ export default function App() {
           appleLink.rel = 'apple-touch-icon';
           document.getElementsByTagName('head')[0].appendChild(appleLink);
         }
-        appleLink.href = settings.appIcon;
-      }
+        appleLink.href = settings.appIcon || iconUrl_192;
 
-      const manifest = {
-        name: settings.appName || "Plus+Launcher",
-        short_name: settings.appName || "Plus+Launcher",
-        start_url: window.location.origin + "/",
-        display: "standalone",
-        background_color: "#111827",
-        theme_color: "#1e3a8a",
-        icons: [
-          {
-            src: settings.appIcon ? new URL(settings.appIcon, window.location.href).href : 'https://ui-avatars.com/api/?name=Plus+Launcher&size=512&background=1e3a8a&color=fff',
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: settings.appIcon ? new URL(settings.appIcon, window.location.href).href : 'https://ui-avatars.com/api/?name=Plus+Launcher&size=192&background=1e3a8a&color=fff',
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any maskable"
-          }
-        ]
-      };
-      
-      const manifestString = JSON.stringify(manifest);
-      const manifestDataUrl = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(manifestString)}`;
-      
-      let manifestLink: HTMLLinkElement | null = document.querySelector("link[rel='manifest']");
-      if (!manifestLink) {
-        manifestLink = document.createElement('link');
-        manifestLink.rel = 'manifest';
-        document.getElementsByTagName('head')[0].appendChild(manifestLink);
+      } catch (e) {
+        console.error("Failed to update dynamic PWA cache", e);
       }
-      
-      // Cleanup previous blob URL if any
-      if (manifestLink.href && manifestLink.href.startsWith("blob:")) {
-        URL.revokeObjectURL(manifestLink.href);
-      }
-      manifestLink.href = manifestDataUrl;
-    }
+    };
+    
+    updatePWA();
   }, [settings.appIcon, settings.appName]);
 
   const [isLocked, setIsLocked] = useState(() => {
