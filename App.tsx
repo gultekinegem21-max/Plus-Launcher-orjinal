@@ -115,6 +115,44 @@ export default function App() {
         document.getElementsByTagName('head')[0].appendChild(link);
       }
       link.href = settings.appIcon;
+
+      let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
+      if (!appleLink) {
+        appleLink = document.createElement('link');
+        appleLink.rel = 'apple-touch-icon';
+        document.getElementsByTagName('head')[0].appendChild(appleLink);
+      }
+      appleLink.href = settings.appIcon;
+
+      const manifest = {
+        name: "Plus+Launcher",
+        short_name: "Plus+",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#111827",
+        theme_color: "#1e3a8a",
+        icons: [
+          {
+            src: settings.appIcon,
+            sizes: "192x192 512x512",
+            type: "image/png",
+            purpose: "any maskable"
+          }
+        ]
+      };
+      
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+      const manifestURL = URL.createObjectURL(blob);
+      let manifestLink: HTMLLinkElement | null = document.querySelector("link[rel='manifest']");
+      if (!manifestLink) {
+        manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        document.getElementsByTagName('head')[0].appendChild(manifestLink);
+      }
+      if (manifestLink.href && manifestLink.href.startsWith("blob:")) {
+        URL.revokeObjectURL(manifestLink.href);
+      }
+      manifestLink.href = manifestURL;
     }
   }, [settings.appIcon]);
 
