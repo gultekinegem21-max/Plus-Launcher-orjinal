@@ -114,23 +114,23 @@ export default function App() {
 
   useEffect(() => {
     // Update the live DOM icon for the preview tab only
-    if (settings.appIcon) {
-      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-      if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.getElementsByTagName('head')[0].appendChild(link);
-      }
-      link.href = settings.appIcon;
-
-      let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
-      if (!appleLink) {
-        appleLink = document.createElement('link');
-        appleLink.rel = 'apple-touch-icon';
-        document.getElementsByTagName('head')[0].appendChild(appleLink);
-      }
-      appleLink.href = settings.appIcon;
+    const iconUrl = settings.appIcon || "/icon.png";
+    
+    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.getElementsByTagName('head')[0].appendChild(link);
     }
+    link.href = iconUrl;
+
+    let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
+    if (!appleLink) {
+      appleLink = document.createElement('link');
+      appleLink.rel = 'apple-touch-icon';
+      document.getElementsByTagName('head')[0].appendChild(appleLink);
+    }
+    appleLink.href = iconUrl;
   }, [settings.appIcon, settings.appName]);
 
   const [isLocked, setIsLocked] = useState(() => {
