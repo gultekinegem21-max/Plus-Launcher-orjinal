@@ -113,97 +113,24 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const updatePWA = async () => {
-      try {
-        const appName = settings.appName || "Plus+Launcher";
-        let iconUrl_192 = `https://ui-avatars.com/api/?name=${encodeURIComponent(appName)}&size=192&background=1e3a8a&color=fff`;
-        let iconUrl_512 = `https://ui-avatars.com/api/?name=${encodeURIComponent(appName)}&size=512&background=1e3a8a&color=fff`;
-        let iconType = 'image/png';
-        
-        if (settings.appIcon && settings.appIcon.startsWith('data:')) {
-          const res = await fetch(settings.appIcon);
-          const blob = await res.blob();
-          iconType = blob.type || 'image/png';
-          
-          if ('caches' in window) {
-            const cache = await caches.open('dynamic-pwa');
-            await cache.put('/dynamic-icon-192.png', new Response(blob, { headers: { 'Content-Type': iconType } }));
-            await cache.put('/dynamic-icon-512.png', new Response(blob, { headers: { 'Content-Type': iconType } }));
-            iconUrl_192 = '/dynamic-icon-192.png';
-            iconUrl_512 = '/dynamic-icon-512.png';
-          }
-        } else if (settings.appIcon) {
-           iconUrl_192 = settings.appIcon;
-           iconUrl_512 = settings.appIcon;
-        }
-
-        const manifest = {
-          name: appName,
-          short_name: appName,
-          start_url: window.location.origin + "/",
-          display: "standalone",
-          background_color: "#111827",
-          theme_color: "#1e3a8a",
-          icons: [
-            {
-              src: iconUrl_192,
-              sizes: "192x192",
-              type: iconType,
-              purpose: "any maskable"
-            },
-            {
-              src: iconUrl_512,
-              sizes: "512x512",
-              type: iconType,
-              purpose: "any maskable"
-            }
-          ]
-        };
-
-        let manifestUrl = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify(manifest))}`;
-
-        if ('caches' in window) {
-          const manifestStr = JSON.stringify(manifest);
-          const cache = await caches.open('dynamic-pwa');
-          await cache.put('/dynamic-manifest.json', new Response(manifestStr, { headers: { 'Content-Type': 'application/manifest+json' } }));
-          manifestUrl = `/dynamic-manifest.json?v=${Date.now()}`;
-        }
-
-        let manifestLink: HTMLLinkElement | null = document.querySelector("link[rel='manifest']");
-        if (!manifestLink) {
-          manifestLink = document.createElement('link');
-          manifestLink.rel = 'manifest';
-          document.getElementsByTagName('head')[0].appendChild(manifestLink);
-        }
-        
-        if (manifestLink.href && manifestLink.href.startsWith("blob:")) {
-          URL.revokeObjectURL(manifestLink.href);
-        }
-        manifestLink.href = manifestUrl;
-        
-        // Also update the favicon
-        let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-        if (!link) {
-          link = document.createElement('link');
-          link.rel = 'icon';
-          document.getElementsByTagName('head')[0].appendChild(link);
-        }
-        link.href = settings.appIcon || iconUrl_192;
-
-        let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
-        if (!appleLink) {
-          appleLink = document.createElement('link');
-          appleLink.rel = 'apple-touch-icon';
-          document.getElementsByTagName('head')[0].appendChild(appleLink);
-        }
-        appleLink.href = settings.appIcon || iconUrl_192;
-
-      } catch (e) {
-        console.error("Failed to update dynamic PWA cache", e);
+    // Update the live DOM icon for the preview tab only
+    if (settings.appIcon) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
       }
-    };
-    
-    updatePWA();
+      link.href = settings.appIcon;
+
+      let appleLink: HTMLLinkElement | null = document.querySelector("link[rel='apple-touch-icon']");
+      if (!appleLink) {
+        appleLink = document.createElement('link');
+        appleLink.rel = 'apple-touch-icon';
+        document.getElementsByTagName('head')[0].appendChild(appleLink);
+      }
+      appleLink.href = settings.appIcon;
+    }
   }, [settings.appIcon, settings.appName]);
 
   const [isLocked, setIsLocked] = useState(() => {
