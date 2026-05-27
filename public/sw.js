@@ -19,32 +19,6 @@ self.addEventListener('fetch', (e) => {
       );
       return;
     }
-    
-    if (url.pathname === '/icon-192.png') {
-      e.respondWith(
-        caches.match(e.request).then(response => {
-          return response || fetch('https://ui-avatars.com/api/?name=Plus+Launcher&size=192&background=1e3a8a&color=fff', { mode: 'cors' }).then(res => {
-            const clone = res.clone();
-            caches.open('pwa-icons').then(cache => cache.put(e.request, clone));
-            return new Response(res.body, { headers: { 'Content-Type': 'image/png' } });
-          });
-        })
-      );
-      return;
-    }
-
-    if (url.pathname === '/icon-512.png') {
-      e.respondWith(
-        caches.match(e.request).then(response => {
-          return response || fetch('https://ui-avatars.com/api/?name=Plus+Launcher&size=512&background=1e3a8a&color=fff', { mode: 'cors' }).then(res => {
-            const clone = res.clone();
-            caches.open('pwa-icons').then(cache => cache.put(e.request, clone));
-            return new Response(res.body, { headers: { 'Content-Type': 'image/png' } });
-          });
-        })
-      );
-      return;
-    }
   } catch(err) {
     // ignore
   }

@@ -116,8 +116,8 @@ export default function App() {
     const updatePWA = async () => {
       try {
         const appName = settings.appName || "Plus+Launcher";
-        let iconUrl_192 = `/icon-192.png`;
-        let iconUrl_512 = `/icon-512.png`;
+        let iconUrl_192 = `https://ui-avatars.com/api/?name=${encodeURIComponent(appName)}&size=192&background=1e3a8a&color=fff`;
+        let iconUrl_512 = `https://ui-avatars.com/api/?name=${encodeURIComponent(appName)}&size=512&background=1e3a8a&color=fff`;
         let iconType = 'image/png';
         
         if (settings.appIcon && settings.appIcon.startsWith('data:')) {
